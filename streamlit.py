@@ -24,7 +24,7 @@ if 'hierarchy_loaded' not in st.session_state:
 # Load the dataset from zip file on GitHub with caching
 @st.cache_data
 def load_data():
-    zip_url = "https://github.com/Shamsfathalla/datascience-streamlit/blob/3d2b65e70bed36e5bd601d0cdf7044c525006bb4/datasets.zip"
+    zip_url = "https://github.com/Shamsfathalla/datascience-streamlit/blob/4d0dafce4475b59548f4e8bd42a8355d2b414ff7/datasets.zip"
     try:
         response = requests.get(zip_url)
         response.raise_for_status()
