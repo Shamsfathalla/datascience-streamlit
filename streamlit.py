@@ -65,7 +65,7 @@ def load_model():
 # Load the region-state hierarchy JSON from GitHub with caching
 @st.cache_data
 def load_region_state_hierarchy():
-    json_url = "https://github.com/Shamsfathalla/datascience-streamlit/blob/18aafec3b2da7197224722e28fcc15fe8d378c80/region_state_hierarchy.json"
+    json_url = "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/a34f45f1bd9b857876cd31bdbee35468b9330b36/region_state_hierarchy.json"
     try:
         response = requests.get(json_url)
         response.raise_for_status()
