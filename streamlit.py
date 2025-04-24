@@ -521,7 +521,6 @@ elif section == "House Price Predictor":
     with col2:
         bath = st.number_input("Number of Bathrooms", min_value=1, max_value=20, value=1, step=1)
     if st.button("Predict House Price"):
-        bed_bath_ratio = bed / bath if bath != 0 else 1.0
         input_data = {
             'property_size': property_size,
             'bed': bed,
