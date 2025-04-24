@@ -509,15 +509,6 @@ elif section == "House Price Predictor":
     cities = sorted(cities) if cities else ["No cities available"]
     selected_city = st.selectbox("Select City", ["Select City"] + cities, index=0)
 
-
-    # Sort cities if available
-    cities = sorted(cities) if cities else []
-    # Ensure there is at least one option in the dropdown
-    if not cities:
-        st.warning("No cities available for this selection. Please adjust your filters.")
-        cities = ["No cities available"]
-    # City dropdown with all available cities
-    selected_city = st.selectbox("Select City", cities)
     # Input property info
     st.subheader("Input House Details")
     col1, col2 = st.columns(2)
