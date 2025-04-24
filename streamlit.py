@@ -495,6 +495,8 @@ elif section == "House Price Predictor":
     ) if (selected_region != "Select Region" and selected_state != "Select State" and selected_city_type_label != "Select City Type") else []
     selected_area_type_label = st.selectbox("Select Area Type", ["Select Area Type"] + area_types, index=0)
 
+    selected_city_type = city_type_map.get(selected_city_type_label, 0)
+    selected_area_type = area_type_map.get(selected_area_type_label.lower(), 0)
     
     # City dropdown
     cities = []
