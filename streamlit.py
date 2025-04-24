@@ -24,7 +24,7 @@ if 'hierarchy_loaded' not in st.session_state:
 # Load the dataset from zip file on GitHub with caching
 @st.cache_data
 def load_data():
-    zip_url = "https://github.com/Shamsfathalla/datascience/raw/9650d83b6560758fb70ae010f4e7ee9c6118894d/datasets.zip"
+    zip_url = "https://github.com/Shamsfathalla/datascience-streamlit/blob/18aafec3b2da7197224722e28fcc15fe8d378c80/datasets.zip"
     try:
         response = requests.get(zip_url)
         response.raise_for_status()
@@ -53,7 +53,7 @@ def load_data():
 # Load the model from GitHub with caching
 @st.cache_resource
 def load_model():
-    model_url = "https://github.com/Shamsfathalla/datascience/raw/7254e82753df4f9ec46768d47f6e491d174bdae4/xgb_house_price_model.joblib"
+    model_url = "https://github.com/Shamsfathalla/datascience-streamlit/blob/18aafec3b2da7197224722e28fcc15fe8d378c80/xgb_house_price_model.joblib"
     try:
         response = requests.get(model_url)
         response.raise_for_status()
@@ -65,7 +65,7 @@ def load_model():
 # Load the region-state hierarchy JSON from GitHub with caching
 @st.cache_data
 def load_region_state_hierarchy():
-    json_url = "https://github.com/Shamsfathalla/datascience/raw/b15fb527d157f93be8fc004346f4852e3e2a5cd0/region_state_hierarchy.json"
+    json_url = "https://github.com/Shamsfathalla/datascience-streamlit/blob/18aafec3b2da7197224722e28fcc15fe8d378c80/region_state_hierarchy.json"
     try:
         response = requests.get(json_url)
         response.raise_for_status()
