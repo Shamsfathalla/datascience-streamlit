@@ -82,7 +82,7 @@ def initialize_transformers(df):
         "acre_lot": MinMaxScaler(),
         "house_size": MinMaxScaler(),
         "property_size": MinMaxScaler(),
-        "price": MinMaxScaler()
+        "price": MinMaxScaler(),
         "bed_bath_ratio": MinMaxScaler()
     }
     # Copy the dataset to avoid modifying the original
