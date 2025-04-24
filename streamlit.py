@@ -478,31 +478,26 @@ elif section == "House Price Predictor":
     st.subheader("Select Geographic Attributes")
    # Region dropdown
     regions = sorted(region_state_hierarchy.keys())
-    selected_region = st.selectbox("Select Region", ["Select a region"] + regions)
+    selected_region = st.selectbox("Select Region", [""] + regions, index=0)
     
-    # State dropdown filtered by region
-    selected_state = None
-    if selected_region != "Select a region":
-        states = sorted(region_state_hierarchy[selected_region].keys())
-        selected_state = st.selectbox("Select State", ["Select a state"] + states)
+    # State dropdown
+    states = sorted(region_state_hierarchy[selected_region].keys()) if selected_region else []
+    selected_state = st.selectbox("Select State", [""] + states, index=0)
     
-    # City type dropdown filtered by region and state
-    selected_city_type_label = None
-    if selected_state and selected_state != "Select a state":
-        city_types = sorted(region_state_hierarchy[selected_region][selected_state].keys())
-        selected_city_type_label = st.selectbox("Select City Type", ["Select a city type"] + city_types)
+    # City Type dropdown
+    city_types = sorted(region_state_hierarchy[selected_region][selected_state].keys()) \
+        if selected_region and selected_state else []
+    selected_city_type_label = st.selectbox("Select City Type", [""] + city_types, index=0)
     
-    # Area type dropdown filtered by region, state, and city type
-    selected_area_type_label = None
-    if selected_city_type_label and selected_city_type_label != "Select a city type":
-        area_types = sorted(region_state_hierarchy[selected_region][selected_state][selected_city_type_label].keys())
-        selected_area_type_label = st.selectbox("Select Area Type", ["Select an area type"] + area_types)
+    # Area Type dropdown
+    area_types = sorted(
+        region_state_hierarchy[selected_region][selected_state][selected_city_type_label].keys()
+    ) if selected_region and selected_state and selected_city_type_label else []
+    selected_area_type_label = st.selectbox("Select Area Type", [""] + area_types, index=0)
     
-    # City dropdown with all cities for the selected filters
-    st.subheader("Select City")
-    selected_city = None
+    # City dropdown
     cities = []
-    if selected_area_type_label and selected_area_type_label != "Select an area type":
+    if selected_region and selected_state and selected_city_type_label and selected_area_type_label:
         try:
             cities = region_state_hierarchy[selected_region][selected_state][selected_city_type_label][selected_area_type_label]
             if not isinstance(cities, list):
@@ -510,8 +505,8 @@ elif section == "House Price Predictor":
                 cities = []
         except (KeyError, TypeError) as e:
             st.error(f"Error loading cities: {e}")
-        cities = sorted(cities) if cities else ["No cities available"]
-        selected_city = st.selectbox("Select City", ["Select a city"] + cities)
+    cities = sorted(cities) if cities else ["No cities available"]
+    selected_city = st.selectbox("Select City", [""] + cities, index=0)
     # Sort cities if available
     cities = sorted(cities) if cities else []
     # Ensure there is at least one option in the dropdown
