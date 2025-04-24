@@ -521,12 +521,10 @@ elif section == "House Price Predictor":
     with col2:
         bath = st.number_input("Number of Bathrooms", min_value=1, max_value=20, value=1, step=1)
     if st.button("Predict House Price"):
-        bed_bath_ratio = bed / bath if bath != 0 else 1.0
         input_data = {
             'property_size': property_size,
             'bed': bed,
             'bath': bath,
-            'bed_bath_ratio': bed_bath_ratio,
             'city_type': selected_city_type,
             'area_type': selected_area_type,
             'region_Midwest': 1 if selected_region == 'Midwest' else 0,
@@ -543,7 +541,7 @@ elif section == "House Price Predictor":
                 input_df[col] = scalers[col].transform(input_df[[col]])
         # Add missing features with defaults
         model_features = ['bed', 'bath', 'acre_lot', 'house_size', 'population_2024', 'density',
-                          'city_type', 'area_type', 'property_size', 'bed_bath_ratio',
+                          'city_type', 'area_type', 'property_size', 
                           'region_Midwest', 'region_Northeast', 'region_South', 'region_West']
         for feature in model_features:
             if feature not in input_df.columns:
