@@ -53,7 +53,7 @@ def load_data():
 # Load the model from GitHub with caching
 @st.cache_resource
 def load_model():
-    model_url = "https://github.com/Shamsfathalla/datascience-streamlit/blob/18aafec3b2da7197224722e28fcc15fe8d378c80/xgb_house_price_model.joblib"
+    model_url = "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0525e619509d1de4140c82cb0145954ef7ace470/xgb_house_price_model.joblib"
     try:
         response = requests.get(model_url)
         response.raise_for_status()
