@@ -473,7 +473,7 @@ elif section == "House Price Predictor":
         "Town": 0, "Small City": 1, "Medium City": 2, "Large City": 3, "Metropolis": 4
     }
     area_type_map = {
-        "rural": 0, "suburban": 1, "urban": 2
+        "Rural": 0, "Suburban": 1, "Urban": 2
     }
     st.subheader("Select Geographic Attributes")
    # Region dropdown
