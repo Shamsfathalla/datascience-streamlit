@@ -482,32 +482,32 @@ elif section == "House Price Predictor":
     # State dropdown filtered by region
     selected_state = None
     if selected_region != "Select a region":
-    states = sorted(region_state_hierarchy[selected_region].keys())
-    selected_state = st.selectbox("Select State", ["Select a state"] + states)
+        states = sorted(region_state_hierarchy[selected_region].keys())
+        selected_state = st.selectbox("Select State", ["Select a state"] + states)
     # City type dropdown filtered by region and state
     selected_city_type_label = None
     if selected_state and selected_state != "Select a state":
-    city_types = sorted(region_state_hierarchy[selected_region][selected_state].keys())
-    selected_city_type_label = st.selectbox("Select City Type", ["Select a city type"] + city_types)
+        city_types = sorted(region_state_hierarchy[selected_region][selected_state].keys())
+        selected_city_type_label = st.selectbox("Select City Type", ["Select a city type"] + city_types)
     # Area type dropdown filtered by region, state, and city type
     selected_area_type_label = None
     if selected_city_type_label and selected_city_type_label != "Select a city type":
-    area_types = sorted(region_state_hierarchy[selected_region][selected_state][selected_city_type_label].keys())
-    selected_area_type_label = st.selectbox("Select Area Type", ["Select an area type"] + area_types)
+        area_types = sorted(region_state_hierarchy[selected_region][selected_state][selected_city_type_label].keys())
+        selected_area_type_label = st.selectbox("Select Area Type", ["Select an area type"] + area_types)
     # City dropdown with all cities for the selected filters
     st.subheader("Select City")
     selected_city = None
     cities = []
-    if selected_area_type_label and selected_area_type_label != "Select an area type":
-    try:
-        cities = region_state_hierarchy[selected_region][selected_state][selected_city_type_label][selected_area_type_label]
-        if not isinstance(cities, list):
-            st.error("City list is not valid.")
-            cities = []
-    except (KeyError, TypeError) as e:
-        st.error(f"Error loading cities: {e}")
-    cities = sorted(cities) if cities else ["No cities available"]
-    selected_city = st.selectbox("Select City", ["Select a city"] + cities)
+        if selected_area_type_label and selected_area_type_label != "Select an area type":
+            try:
+                cities = region_state_hierarchy[selected_region][selected_state][selected_city_type_label][selected_area_type_label]
+                if not isinstance(cities, list):
+                    st.error("City list is not valid.")
+                    cities = []
+                    except (KeyError, TypeError) as e:
+                    st.error(f"Error loading cities: {e}")
+                    cities = sorted(cities) if cities else ["No cities available"]
+                    selected_city = st.selectbox("Select City", ["Select a city"] + cities)
     # Sort cities if available
     cities = sorted(cities) if cities else []
     # Ensure there is at least one option in the dropdown
