@@ -493,7 +493,7 @@ elif section == "House Price Predictor":
     area_types = sorted(
         region_state_hierarchy[selected_region][selected_state][selected_city_type_label].keys()
     ) if (selected_region != "Select Region" and selected_state != "Select State" and selected_city_type_label != "Select City Type") else []
-    selected_area_type_label = st.selectbox("Select Area Type", ["Select Area Type"] + area_types, index=0)d_area_type_label = st.selectbox("Select Area Type", ["Select Area Type"] + area_types, index=0)
+    selected_area_type_label = st.selectbox("Select Area Type", ["Select Area Type"] + area_types, index=0)area_type_label = st.selectbox("Select Area Type", ["Select Area Type"] + area_types, index=0)
     
     # City dropdown
     cities = []
