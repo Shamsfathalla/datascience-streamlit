@@ -656,7 +656,7 @@ if section == "House Price Predictor":
 
     # City dropdown
     cities = []
-    if (selected_region != "Select Region" and selected_state != "Select State" and 
+    if (selected_region != "Select Region" and selected_state != "Select State" and
         selected_city_type_label != "Select City Type" and selected_area_type_label != "Select Area Type"):
         try:
             cities = region_state_hierarchy[selected_region][selected_state][selected_city_type_label][selected_area_type_label]
@@ -669,6 +669,9 @@ if section == "House Price Predictor":
     selected_city = st.selectbox("Select City", ["Select City"] + cities, index=0)
 
     ### --- New: Get city coordinates and plot city map --- ###
+    from geopy.geocoders import Nominatim
+    import plotly.express as px
+
     def get_city_coords(city, state=None, country="USA"):
         geolocator = Nominatim(user_agent="house_price_app")
         location_query = city
@@ -768,3 +771,4 @@ if section == "House Price Predictor":
             st.success(f"**Predicted House Price in {selected_city}:** ${final_prediction:,.2f}")
         except Exception as e:
             st.error(f"Prediction error: {str(e)}")
+
