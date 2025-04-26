@@ -433,7 +433,9 @@ def plot_us_map(selected_state_name):
     )
     return fig
 
-elif section == "House Price Predictor":
+
+# Make sure this is 'if' if there is no prior if checking 'section'
+if section == "House Price Predictor":
     st.header("5. Predict House Price")
     st.write("Enter the details below to predict the house price based on property size, bedrooms, bathrooms, region, city type, area type, and city.")
 
@@ -555,3 +557,4 @@ elif section == "House Price Predictor":
             st.success(f"**Predicted House Price in {selected_city}:** ${final_prediction:,.2f}")
         except Exception as e:
             st.error(f"Prediction error: {str(e)}")
+
