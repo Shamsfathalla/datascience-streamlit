@@ -391,7 +391,6 @@ elif section == "Urban/Suburban/Rural Prices":
 elif section == "House Price Predictor":
     st.header("5. Predict House Price")
     st.write("Enter the details below to predict the house price based on property size, bedrooms, bathrooms, region, city type, area type, and city.")
-    
     # Map numerical codes to labels
     city_type_map = {
         "Town": 0, "Small City": 1, "Medium City": 2, "Large City": 3, "Metropolis": 4
@@ -399,7 +398,6 @@ elif section == "House Price Predictor":
     area_type_map = {
         "Rural": 0, "Suburban": 1, "Urban": 2
     }
-    
     st.subheader("Select Geographic Attributes")
     # Region dropdown
     regions = sorted(region_state_hierarchy.keys())
@@ -445,7 +443,6 @@ elif section == "House Price Predictor":
         bed = st.number_input("Number of Bedrooms", min_value=1, max_value=20, value=1, step=1)
     with col2:
         bath = st.number_input("Number of Bathrooms", min_value=1, max_value=20, value=1, step=1)
-    
     if st.button("Predict House Price"):
         bed_bath_ratio = bed / bath if bath != 0 else 1.0
         input_data = {
@@ -461,15 +458,16 @@ elif section == "House Price Predictor":
             'region_West': 1 if selected_region == 'West' else 0,
         }
         input_df = pd.DataFrame([input_data])
-        
         # Transform numerical features
         for col in ['property_size', 'bed_bath_ratio']:
             if col in input_df.columns and col in power_transformers:
                 input_df[col] = np.log1p(input_df[col])
                 input_df[col] = power_transformers[col].transform(input_df[[col]])
                 input_df[col] = scalers[col].transform(input_df[[col]])
-        
         # Add missing features with defaults
+        model_features = ['bed', 'bath', 'acre_lot', 'house_size', 'population_2024', 'density',
+                          'city_type', 'area_type', 'property_size', 'bed_bath_ratio',
+                          'region_Midwest', 'region_Northeast', 'region_South', 'region_West']
         for feature in model_features:
             if feature not in input_df.columns:
                 if feature in df.columns:
@@ -485,9 +483,7 @@ elif section == "House Price Predictor":
                         input_df[feature] = median_value
                 else:
                     input_df[feature] = 0
-        
         input_df = input_df[model_features]
-        
         # Predict and inverse-transform the price
         try:
             prediction = model.predict(input_df)[0]
