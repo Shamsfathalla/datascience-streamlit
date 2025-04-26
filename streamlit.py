@@ -388,6 +388,13 @@ elif section == "Urban/Suburban/Rural Prices":
     - Prices increase from rural to suburban to urban due to density, land availability, and amenities.
     """)
 
+import streamlit as st
+import plotly.graph_objects as go
+import pandas as pd
+import numpy as np
+
+# Your existing variables (region_state_hierarchy, power_transformers, scalers, model, df) assumed imported
+
 # State name to abbreviation mapping
 state_abbrev = {
     'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA',
@@ -402,39 +409,113 @@ state_abbrev = {
     'Virginia': 'VA', 'Washington': 'WA', 'West Virginia': 'WV', 'Wisconsin': 'WI', 'Wyoming': 'WY'
 }
 
-def plot_us_map(selected_state_name):
-    if selected_state_name in state_abbrev:
-        selected_state_code = state_abbrev[selected_state_name]
+# Define your regions
+northeast_states = {
+    "Connecticut", "Maine", "Massachusetts", "New Hampshire", "Rhode Island", "Vermont",
+    "New Jersey", "New York", "Pennsylvania"
+}
+
+midwest_states = {
+    "Illinois", "Indiana", "Iowa", "Kansas", "Michigan", "Minnesota", "Missouri", "Nebraska",
+    "North Dakota", "Ohio", "South Dakota", "Wisconsin"
+}
+
+south_states = {
+    "Alabama", "Arkansas", "Delaware", "Florida", "Georgia", "Kentucky", "Louisiana", "Maryland",
+    "Mississippi", "North Carolina", "Oklahoma", "South Carolina", "Tennessee", "Texas",
+    "Virginia", "West Virginia"
+}
+
+west_states = {
+    "Alaska", "Arizona", "California", "Colorado", "Hawaii", "Idaho", "Montana", "Nevada",
+    "New Mexico", "Oregon", "Utah", "Washington", "Wyoming"
+}
+
+def get_region_for_state(state):
+    if state in northeast_states:
+        return 'Northeast'
+    elif state in midwest_states:
+        return 'Midwest'
+    elif state in south_states:
+        return 'South'
+    elif state in west_states:
+        return 'West'
     else:
-        selected_state_code = None
+        return 'Other'
 
+def plot_region_map(selected_state_name):
+    # Get all states and their codes
     states_codes = list(state_abbrev.values())
-    values = [1 if code == selected_state_code else 0 for code in states_codes]
+    states_names = list(state_abbrev.keys())
 
+    # Assign a region color code to each state
+    region_color_map = {
+        'Northeast': 0,
+        'Midwest': 1,
+        'South': 2,
+        'West': 3,
+        'Other': 4
+    }
+    # Colors for regions
+    colorscale = [
+        [0.0, '#636efa'],   # Northeast - blue
+        [0.25, '#636efa'],
+        [0.25, '#EF553B'],  # Midwest - red
+        [0.5, '#EF553B'],
+        [0.5, '#00cc96'],   # South - green
+        [0.75, '#00cc96'],
+        [0.75, '#ab63fa'],  # West - purple
+        [1.0, '#ab63fa']
+    ]
+
+    # Map each state to its region index
+    z = []
+    for st in states_names:
+        region = get_region_for_state(st)
+        z.append(region_color_map.get(region, 4))  # Default to 4 if not found
+
+    # Create base choropleth colored by region
     fig = go.Figure(data=go.Choropleth(
         locations=states_codes,
-        z=values,
+        z=z,
         locationmode='USA-states',
-        colorscale=[[0, 'lightgray'], [1, 'orange']],
+        colorscale=colorscale,
         showscale=False,
         marker_line_color='white',
         marker_line_width=1,
+        zmin=0,
+        zmax=3
     ))
 
+    # Highlight selected state with orange border
+    if selected_state_name in state_abbrev:
+        selected_code = state_abbrev[selected_state_name]
+        fig.add_trace(go.Choropleth(
+            locations=[selected_code],
+            z=[1],  # dummy value
+            locationmode='USA-states',
+            colorscale=[[0, 'rgba(0,0,0,0)'], [1, 'rgba(0,0,0,0)']],  # transparent fill
+            showscale=False,
+            marker_line_color='orange',
+            marker_line_width=4,
+            hoverinfo='location',
+            name='Selected State'
+        ))
+
     fig.update_layout(
-        title_text='Selected State Highlight',
+        title_text='US Map Colored by Region with Selected State Highlight',
         geo=dict(
             scope='usa',
             projection=go.layout.geo.Projection(type='albers usa'),
             showlakes=True,
             lakecolor='rgb(255, 255, 255)'
         ),
-        margin={"r":0,"t":30,"l":0,"b":0}
+        margin={"r":0,"t":40,"l":0,"b":0}
     )
     return fig
 
 
-# Make sure this is 'if' if there is no prior if checking 'section'
+# --- Your main Streamlit code here ---
 if section == "House Price Predictor":
     st.header("5. Predict House Price")
     st.write("Enter the details below to predict the house price based on property size, bedrooms, bathrooms, region, city type, area type, and city.")
@@ -457,12 +538,9 @@ if section == "House Price Predictor":
     states = sorted(region_state_hierarchy[selected_region].keys()) if selected_region != "Select Region" else []
     selected_state = st.selectbox("Select State", ["Select State"] + states, index=0)
 
-    # Show map highlighting selected state
-    if selected_state != "Select State":
-        fig = plot_us_map(selected_state)
-        st.plotly_chart(fig, use_container_width=True)
-    else:
-        st.info("Select a state to see it highlighted on the US map.")
+    # Always show map (no else)
+    fig = plot_region_map(selected_state if selected_state != "Select State" else None)
+    st.plotly_chart(fig, use_container_width=True)
 
     # City Type dropdown
     city_types = sorted(region_state_hierarchy[selected_region][selected_state].keys()) \
@@ -557,4 +635,5 @@ if section == "House Price Predictor":
             st.success(f"**Predicted House Price in {selected_city}:** ${final_prediction:,.2f}")
         except Exception as e:
             st.error(f"Prediction error: {str(e)}")
+
 
