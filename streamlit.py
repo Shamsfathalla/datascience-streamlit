@@ -593,6 +593,9 @@ def plot_region_map(selected_state_name):
 
     return fig
 
+from geopy.geocoders import Nominatim
+import plotly.express as px
+
 if section == "House Price Predictor":
     st.header("5. Predict House Price")
     st.write("Enter the details below to predict the house price based on property size, bedrooms, bathrooms, region, city type, area type, and city.")
@@ -665,6 +668,41 @@ if section == "House Price Predictor":
     cities = sorted(cities) if cities else ["No cities available"]
     selected_city = st.selectbox("Select City", ["Select City"] + cities, index=0)
 
+    ### --- New: Get city coordinates and plot city map --- ###
+    def get_city_coords(city, state=None, country="USA"):
+        geolocator = Nominatim(user_agent="house_price_app")
+        location_query = city
+        if state:
+            location_query += f", {state}"
+        location_query += f", {country}"
+        location = geolocator.geocode(location_query)
+        if location:
+            return location.latitude, location.longitude
+        return None, None
+
+    def plot_city_map(city, lat, lon):
+        fig = px.scatter_mapbox(
+            lat=[lat],
+            lon=[lon],
+            zoom=10,
+            height=400,
+            mapbox_style="open-street-map",
+            hover_name=[city],
+            title=f"Location of {city}"
+        )
+        return fig
+
+    if selected_city not in ["Select City", "No cities available"]:
+        lat, lon = get_city_coords(selected_city, selected_state)
+        if lat and lon:
+            city_fig = plot_city_map(selected_city, lat, lon)
+            st.subheader(f"Map for {selected_city}")
+            st.plotly_chart(city_fig, use_container_width=True)
+        else:
+            st.error("Sorry, could not find coordinates for the selected city.")
+
+    ### --- End new code --- ###
+
     # Input property info
     st.subheader("Input House Details")
     col1, col2 = st.columns(2)
@@ -730,4 +768,3 @@ if section == "House Price Predictor":
             st.success(f"**Predicted House Price in {selected_city}:** ${final_prediction:,.2f}")
         except Exception as e:
             st.error(f"Prediction error: {str(e)}")
-
