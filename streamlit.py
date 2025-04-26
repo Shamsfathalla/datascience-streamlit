@@ -492,9 +492,9 @@ def plot_region_map(selected_state_name=None, selected_city_name=None):
         selected_code = state_abbrev[selected_state_name]
         fig.add_trace(go.Choropleth(
             locations=[selected_code],
-            z=[1],  # dummy
+            z=[1],  # dummy value
             locationmode='USA-states',
-            colorscale=[[0, 'rgba(0,0,0,0)'], [1, 'rgba(0,0,0,0)']],  # transparent fill
+            colorscale=[[0, 'rgba(0,0,0,0)'], [1, 'rgba(0,0,0,0)']],  # fully transparent fill
             showscale=False,
             marker_line_color='orange',
             marker_line_width=4,
@@ -513,7 +513,8 @@ def plot_region_map(selected_state_name=None, selected_city_name=None):
                 marker=dict(size=12, color='red', symbol='star'),
                 text=[selected_city_name],
                 textposition="top center",
-                name='Selected City'
+                name='Selected City',
+                geo='geo'  # Important: link to same geo scope
             ))
 
     fig.update_geos(
@@ -522,6 +523,8 @@ def plot_region_map(selected_state_name=None, selected_city_name=None):
         showlakes=True,
         lakecolor='rgb(255, 255, 255)',
         projection_type='albers usa',
+        lataxis_range=[20, 55],
+        lonaxis_range=[-130, -65],
     )
 
     # Legend
