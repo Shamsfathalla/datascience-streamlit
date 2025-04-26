@@ -437,11 +437,54 @@ def get_region_for_state(state):
         return 'Other'
 
 def plot_region_map(selected_state_name):
-    # Get all states and their codes
+    # State abbreviation dictionary (assuming it's available globally or pass it in)
+    state_abbrev = {
+        'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA',
+        'Colorado': 'CO', 'Connecticut': 'CT', 'Delaware': 'DE', 'Florida': 'FL', 'Georgia': 'GA',
+        'Hawaii': 'HI', 'Idaho': 'ID', 'Illinois': 'IL', 'Indiana': 'IN', 'Iowa': 'IA',
+        'Kansas': 'KS', 'Kentucky': 'KY', 'Louisiana': 'LA', 'Maine': 'ME', 'Maryland': 'MD',
+        'Massachusetts': 'MA', 'Michigan': 'MI', 'Minnesota': 'MN', 'Mississippi': 'MS', 'Missouri': 'MO',
+        'Montana': 'MT', 'Nebraska': 'NE', 'Nevada': 'NV', 'New Hampshire': 'NH', 'New Jersey': 'NJ',
+        'New Mexico': 'NM', 'New York': 'NY', 'North Carolina': 'NC', 'North Dakota': 'ND', 'Ohio': 'OH',
+        'Oklahoma': 'OK', 'Oregon': 'OR', 'Pennsylvania': 'PA', 'Rhode Island': 'RI', 'South Carolina': 'SC',
+        'South Dakota': 'SD', 'Tennessee': 'TN', 'Texas': 'TX', 'Utah': 'UT', 'Vermont': 'VT',
+        'Virginia': 'VA', 'Washington': 'WA', 'West Virginia': 'WV', 'Wisconsin': 'WI', 'Wyoming': 'WY'
+    }
+
+    # Define sets of states for regions
+    northeast_states = {
+        "Connecticut", "Maine", "Massachusetts", "New Hampshire", "Rhode Island", "Vermont",
+        "New Jersey", "New York", "Pennsylvania"
+    }
+    midwest_states = {
+        "Illinois", "Indiana", "Iowa", "Kansas", "Michigan", "Minnesota", "Missouri", "Nebraska",
+        "North Dakota", "Ohio", "South Dakota", "Wisconsin"
+    }
+    south_states = {
+        "Alabama", "Arkansas", "Delaware", "Florida", "Georgia", "Kentucky", "Louisiana", "Maryland",
+        "Mississippi", "North Carolina", "Oklahoma", "South Carolina", "Tennessee", "Texas",
+        "Virginia", "West Virginia"
+    }
+    west_states = {
+        "Alaska", "Arizona", "California", "Colorado", "Hawaii", "Idaho", "Montana", "Nevada",
+        "New Mexico", "Oregon", "Utah", "Washington", "Wyoming"
+    }
+
+    def get_region_for_state(state):
+        if state in northeast_states:
+            return 'Northeast'
+        elif state in midwest_states:
+            return 'Midwest'
+        elif state in south_states:
+            return 'South'
+        elif state in west_states:
+            return 'West'
+        else:
+            return 'Other'
+
     states_codes = list(state_abbrev.values())
     states_names = list(state_abbrev.keys())
 
-    # Assign a region color code to each state
     region_color_map = {
         'Northeast': 0,
         'Midwest': 1,
@@ -449,7 +492,7 @@ def plot_region_map(selected_state_name):
         'West': 3,
         'Other': 4
     }
-    # Colors for regions
+
     colorscale = [
         [0.0, '#636efa'],   # Northeast - blue
         [0.25, '#636efa'],
@@ -461,13 +504,8 @@ def plot_region_map(selected_state_name):
         [1.0, '#ab63fa']
     ]
 
-    # Map each state to its region index
-    z = []
-    for st in states_names:
-        region = get_region_for_state(st)
-        z.append(region_color_map.get(region, 4))  # Default to 4 if not found
+    z = [region_color_map.get(get_region_for_state(st), 4) for st in states_names]
 
-    # Create base choropleth colored by region
     fig = go.Figure(data=go.Choropleth(
         locations=states_codes,
         z=z,
@@ -480,7 +518,6 @@ def plot_region_map(selected_state_name):
         zmax=3
     ))
 
-    # Highlight selected state with orange border
     if selected_state_name in state_abbrev:
         selected_code = state_abbrev[selected_state_name]
         fig.add_trace(go.Choropleth(
@@ -495,20 +532,21 @@ def plot_region_map(selected_state_name):
             name='Selected State'
         ))
 
-    # Add legend markers and labels for regions
+    # Legend data
     region_names = ['Northeast', 'Midwest', 'South', 'West']
     region_colors = ['#636efa', '#EF553B', '#00cc96', '#ab63fa']
 
-    legend_x = 1.02  # position to the right of the map (x-axis)
-    legend_y_start = 0.95  # start near top of plot (y-axis)
-    legend_y_step = 0.07   # vertical spacing between legend items
+    # Legend position settings
+    legend_x = 1.05  # position legend outside plot on the right
+    legend_y_start = 0.9
+    legend_y_step = 0.1
 
     for i, (name, color) in enumerate(zip(region_names, region_colors)):
         fig.add_trace(go.Scatter(
             x=[legend_x],
             y=[legend_y_start - i * legend_y_step],
             mode='markers+text',
-            marker=dict(color=color, size=15),
+            marker=dict(color=color, size=20, symbol='square'),
             text=[name],
             textposition='middle right',
             showlegend=False,
@@ -516,15 +554,16 @@ def plot_region_map(selected_state_name):
         ))
 
     fig.update_layout(
-        title_text='US Map Colored by Region with Selected State Highlight',
+        margin=dict(r=120, t=40, l=0, b=0),
         geo=dict(
             scope='usa',
             projection=go.layout.geo.Projection(type='albers usa'),
             showlakes=True,
             lakecolor='rgb(255, 255, 255)'
         ),
-        margin={"r":80, "t":40, "l":0, "b":0}  # Add right margin for legend space
+        title_text='US Map Colored by Region with Selected State Highlight',
     )
+
     return fig
 
 if section == "House Price Predictor":
