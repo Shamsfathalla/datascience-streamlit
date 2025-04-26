@@ -387,10 +387,55 @@ elif section == "Urban/Suburban/Rural Prices":
     - Prices increase from rural to suburban to urban due to density, land availability, and amenities.
     """)
 
-# House Price Predictor section
+# State name to abbreviation mapping
+state_abbrev = {
+    'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA',
+    'Colorado': 'CO', 'Connecticut': 'CT', 'Delaware': 'DE', 'Florida': 'FL', 'Georgia': 'GA',
+    'Hawaii': 'HI', 'Idaho': 'ID', 'Illinois': 'IL', 'Indiana': 'IN', 'Iowa': 'IA',
+    'Kansas': 'KS', 'Kentucky': 'KY', 'Louisiana': 'LA', 'Maine': 'ME', 'Maryland': 'MD',
+    'Massachusetts': 'MA', 'Michigan': 'MI', 'Minnesota': 'MN', 'Mississippi': 'MS', 'Missouri': 'MO',
+    'Montana': 'MT', 'Nebraska': 'NE', 'Nevada': 'NV', 'New Hampshire': 'NH', 'New Jersey': 'NJ',
+    'New Mexico': 'NM', 'New York': 'NY', 'North Carolina': 'NC', 'North Dakota': 'ND', 'Ohio': 'OH',
+    'Oklahoma': 'OK', 'Oregon': 'OR', 'Pennsylvania': 'PA', 'Rhode Island': 'RI', 'South Carolina': 'SC',
+    'South Dakota': 'SD', 'Tennessee': 'TN', 'Texas': 'TX', 'Utah': 'UT', 'Vermont': 'VT',
+    'Virginia': 'VA', 'Washington': 'WA', 'West Virginia': 'WV', 'Wisconsin': 'WI', 'Wyoming': 'WY'
+}
+
+def plot_us_map(selected_state_name):
+    if selected_state_name in state_abbrev:
+        selected_state_code = state_abbrev[selected_state_name]
+    else:
+        selected_state_code = None
+
+    states_codes = list(state_abbrev.values())
+    values = [1 if code == selected_state_code else 0 for code in states_codes]
+
+    fig = go.Figure(data=go.Choropleth(
+        locations=states_codes,
+        z=values,
+        locationmode='USA-states',
+        colorscale=[[0, 'lightgray'], [1, 'orange']],
+        showscale=False,
+        marker_line_color='white',
+        marker_line_width=1,
+    ))
+
+    fig.update_layout(
+        title_text='Selected State Highlight',
+        geo=dict(
+            scope='usa',
+            projection=go.layout.geo.Projection(type='albers usa'),
+            showlakes=True,
+            lakecolor='rgb(255, 255, 255)'
+        ),
+        margin={"r":0,"t":30,"l":0,"b":0}
+    )
+    return fig
+
 elif section == "House Price Predictor":
     st.header("5. Predict House Price")
     st.write("Enter the details below to predict the house price based on property size, bedrooms, bathrooms, region, city type, area type, and city.")
+
     # Map numerical codes to labels
     city_type_map = {
         "Town": 0, "Small City": 1, "Medium City": 2, "Large City": 3, "Metropolis": 4
@@ -398,20 +443,29 @@ elif section == "House Price Predictor":
     area_type_map = {
         "Rural": 0, "Suburban": 1, "Urban": 2
     }
+
     st.subheader("Select Geographic Attributes")
+
     # Region dropdown
     regions = sorted(region_state_hierarchy.keys())
     selected_region = st.selectbox("Select Region", ["Select Region"] + regions, index=0)
-    
+
     # State dropdown
     states = sorted(region_state_hierarchy[selected_region].keys()) if selected_region != "Select Region" else []
     selected_state = st.selectbox("Select State", ["Select State"] + states, index=0)
-    
+
+    # Show map highlighting selected state
+    if selected_state != "Select State":
+        fig = plot_us_map(selected_state)
+        st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.info("Select a state to see it highlighted on the US map.")
+
     # City Type dropdown
     city_types = sorted(region_state_hierarchy[selected_region][selected_state].keys()) \
         if selected_region != "Select Region" and selected_state != "Select State" else []
     selected_city_type_label = st.selectbox("Select City Type", ["Select City Type"] + city_types, index=0)
-    
+
     # Area Type dropdown
     area_types = sorted(
         region_state_hierarchy[selected_region][selected_state][selected_city_type_label].keys()
@@ -420,7 +474,7 @@ elif section == "House Price Predictor":
 
     selected_city_type = city_type_map.get(selected_city_type_label, 0)
     selected_area_type = area_type_map.get(selected_area_type_label.lower(), 0)
-    
+
     # City dropdown
     cities = []
     if (selected_region != "Select Region" and selected_state != "Select State" and 
@@ -443,6 +497,7 @@ elif section == "House Price Predictor":
         bed = st.number_input("Number of Bedrooms", min_value=1, max_value=20, value=1, step=1)
     with col2:
         bath = st.number_input("Number of Bathrooms", min_value=1, max_value=20, value=1, step=1)
+
     if st.button("Predict House Price"):
         bed_bath_ratio = bed / bath if bath != 0 else 1.0
         input_data = {
@@ -458,12 +513,14 @@ elif section == "House Price Predictor":
             'region_West': 1 if selected_region == 'West' else 0,
         }
         input_df = pd.DataFrame([input_data])
+
         # Transform numerical features
         for col in ['property_size', 'bed_bath_ratio']:
             if col in input_df.columns and col in power_transformers:
                 input_df[col] = np.log1p(input_df[col])
                 input_df[col] = power_transformers[col].transform(input_df[[col]])
                 input_df[col] = scalers[col].transform(input_df[[col]])
+
         # Add missing features with defaults
         model_features = ['bed', 'bath', 'acre_lot', 'house_size', 'population_2024', 'density',
                           'city_type', 'area_type', 'property_size', 'bed_bath_ratio',
@@ -484,6 +541,7 @@ elif section == "House Price Predictor":
                 else:
                     input_df[feature] = 0
         input_df = input_df[model_features]
+
         # Predict and inverse-transform the price
         try:
             prediction = model.predict(input_df)[0]
