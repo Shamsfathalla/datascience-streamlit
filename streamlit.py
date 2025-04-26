@@ -27,7 +27,7 @@ def load_data():
         response = requests.get(zip_url)
         response.raise_for_status()
         with zipfile.ZipFile(io.BytesIO(response.content)) as zip_ref:
-            csv_file_name = next((f for f in zip_ref.namelist() if "dataset_features_encoded_capped.csv" in f), None)
+            csv_file_name = next((f for f in zip_ref.namelist() if "dataset_features_encoded_capped.csv" in f), None
             if csv_file_name:
                 with zip_ref.open(csv_file_name) as csv_file:
                     df = pd.read_csv(csv_file)
@@ -151,21 +151,28 @@ st.markdown("""
         font-size: 14px;
         display: inline-block;
         text-align: center;
-        flex: 1;
-        min-width: 0;
     }
     .graph-button:hover {
         background-color: rgb(50, 51, 60);
     }
     .stButton > button {
         width: auto;
+        display: inline-block;
+        margin: 0 5px 5px 0;
     }
-    .button-container {
+    .button-row {
         display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
         justify-content: center;
         gap: 10px;
-        flex-wrap: wrap;
         margin-bottom: 20px;
+    }
+    @media (max-width: 768px) {
+        .button-row {
+            flex-wrap: wrap;
+            justify-content: center;
+        }
     }
     </style>
 """, unsafe_allow_html=True)
@@ -211,7 +218,7 @@ elif section == "Regional Price Differences":
     }
     
     # Create centered container for buttons
-    st.markdown('<div class="button-container">', unsafe_allow_html=True)
+    st.markdown('<div class="button-row">', unsafe_allow_html=True)
     selected_graph = list(graphs.keys())[0]  # Default to first graph
     for graph_title, graph_url in graphs.items():
         if st.button(graph_title, key=graph_title, help=graph_title):
@@ -259,7 +266,7 @@ elif section == "Bedrooms/Bathrooms Impact":
     }
     
     # Create centered container for buttons
-    st.markdown('<div class="button-container">', unsafe_allow_html=True)
+    st.markdown('<div class="button-row">', unsafe_allow_html=True)
     selected_graph = list(graphs.keys())[0]  # Default to first graph
     for graph_title, graph_url in graphs.items():
         if st.button(graph_title, key=graph_title, help=graph_title):
@@ -298,7 +305,7 @@ elif section == "House Size by City Type ":
     }
     
     # Create centered container for buttons
-    st.markdown('<div class="button-container">', unsafe_allow_html=True)
+    st.markdown('<div class="button-row">', unsafe_allow_html=True)
     selected_graph = list(graphs.keys())[0]  # Default to first graph
     for graph_title, graph_url in graphs.items():
         if st.button(graph_title, key=graph_title, help=graph_title):
@@ -345,7 +352,7 @@ elif section == "Urban/Suburban/Rural Prices":
     }
     
     # Create centered container for buttons
-    st.markdown('<div class="button-container">', unsafe_allow_html=True)
+    st.markdown('<div class="button-row">', unsafe_allow_html=True)
     selected_graph = list(graphs.keys())[0]  # Default to first graph
     for graph_title, graph_url in graphs.items():
         if st.button(graph_title, key=graph_title, help=graph_title):
@@ -376,7 +383,7 @@ elif section == "House Price Predictor":
     st.header("5. Predict House Price")
     st.write("Enter the details below to predict the house price based on property size, bedrooms, bathrooms, region, city type, area type, and city.")
     
-    # Map numerical codes to labels with capitalized options
+    # Map numerical codes to labels with capitalized display but lowercase keys
     city_type_map = {
         "Town": 0, 
         "Small City": 1, 
@@ -396,7 +403,7 @@ elif section == "House Price Predictor":
     selected_region = st.selectbox("Select Region", ["Select Region"] + regions, index=0)
     
     # State dropdown
-    states = sorted(region_state_hierarchy[selected_region].keys()) if selected_region != "Select Region" else []
+    states = sorted(region_state_hierarchy[selected_region.lower()].keys()) if selected_region != "Select Region" else []
     selected_state = st.selectbox("Select State", ["Select State"] + states, index=0)
     
     # City Type dropdown with capitalized options
@@ -415,7 +422,9 @@ elif section == "House Price Predictor":
     if (selected_region != "Select Region" and selected_state != "Select State" and 
         selected_city_type_label != "Select City Type" and selected_area_type_label != "Select Area Type"):
         try:
-            cities = region_state_hierarchy[selected_region][selected_state][selected_city_type_label][selected_area_type_label]
+            city_type_key = selected_city_type_label.lower()
+            area_type_key = selected_area_type_label.lower()
+            cities = region_state_hierarchy[selected_region.lower()][selected_state.lower()][city_type_key][area_type_key]
             if not isinstance(cities, list):
                 st.error("City list is not valid.")
                 cities = []
