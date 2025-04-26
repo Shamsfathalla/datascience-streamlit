@@ -11,43 +11,6 @@ from sklearn.preprocessing import MinMaxScaler, PowerTransformer
 # Set page config (must be first Streamlit command)
 st.set_page_config(page_title="U.S. Housing Market Analysis", layout="wide")
 
-# Custom CSS for improved button styling
-st.markdown("""
-<style>
-    /* Style the navigation buttons to look like a slider */
-    div.stButton > button:first-child {
-        width: 100%;
-        border-radius: 4px;
-        border: 1px solid #4a8bc9;
-        background-color: #f0f2f6;
-        color: #4a8bc9;
-        padding: 8px 12px;
-        margin: 0 2px;
-        transition: all 0.3s;
-        font-weight: normal;
-    }
-    div.stButton > button:first-child:hover {
-        background-color: #4a8bc9;
-        color: white;
-    }
-    /* Highlight the active button */
-    div.stButton > button:focus:not(:active) {
-        background-color: #4a8bc9;
-        color: white;
-        box-shadow: none;
-        font-weight: bold;
-    }
-    /* Center align headers */
-    h1, h2, h3, h4, h5, h6 {
-        text-align: center;
-    }
-    /* Add some spacing */
-    .stButton {
-        margin-bottom: 1rem;
-    }
-</style>
-""", unsafe_allow_html=True)
-
 # Initialize session state to track dataset, model, and hierarchy loading
 if 'dataset_loaded' not in st.session_state:
     st.session_state.dataset_loaded = False
@@ -183,7 +146,7 @@ section = st.sidebar.radio("Go to",
                          ["Home", 
                           "Regional Price Differences", 
                           "Bedrooms/Bathrooms Impact", 
-                          "House Size by City Type", 
+                          "House Size by City Type " , 
                           "Urban/Suburban/Rural Prices",
                           "House Price Predictor"])
 
@@ -209,26 +172,19 @@ elif section == "Regional Price Differences":
     
     # Define the graphs for this section
     graphs = {
-        "Property Price": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Property%20Price%20by%20Region.png",
-        "Population": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Population%20in%202024%20by%20Region.png",
-        "Density": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Density%20by%20Region.png"
+        "Average Property Price by Region": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Property%20Price%20by%20Region.png",
+        "Average Population in 2024 by Region": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Population%20in%202024%20by%20Region.png",
+        "Average Density by Region": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Density%20by%20Region.png"
     }
     
     # Create navigation tabs for graphs
-    cols = st.columns(len(graphs))
-    selected_graph = None
-    for i, (graph_name, _) in enumerate(graphs.items()):
-        with cols[i]:
-            if st.button(graph_name, key=f"regional_{i}"):
-                selected_graph = graph_name
-    
-    # Default to first graph if none selected
-    selected_graph = selected_graph or list(graphs.keys())[0]
+    selected_graph = st.radio("Select a graph to view:", list(graphs.keys()), horizontal=True)
     
     # Display the selected graph
     st.subheader(selected_graph)
     st.image(graphs[selected_graph], use_container_width=True)
     
+    # Consistent insights section
     st.write("""
     ### Key Insights:
     - West Region:
@@ -254,26 +210,19 @@ elif section == "Bedrooms/Bathrooms Impact":
     
     # Define the graphs for this section
     graphs = {
-        "Bedrooms": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Bedrooms%20vs%20Price.png",
-        "Bathrooms": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Bathrooms%20vs%20Price.png",
-        "Bed/Bath Ratio": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Bed&Bath%20Ratio%20vs%20Price.png"
+        "Bedrooms vs Price": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Bedrooms%20vs%20Price.png",
+        "Bathrooms vs Price": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Bathrooms%20vs%20Price.png",
+        "Bed/Bath Ratio vs Price": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Bed&Bath%20Ratio%20vs%20Price.png"
     }
     
     # Create navigation tabs for graphs
-    cols = st.columns(len(graphs))
-    selected_graph = None
-    for i, (graph_name, _) in enumerate(graphs.items()):
-        with cols[i]:
-            if st.button(graph_name, key=f"bedbath_{i}"):
-                selected_graph = graph_name
-    
-    # Default to first graph if none selected
-    selected_graph = selected_graph or list(graphs.keys())[0]
+    selected_graph = st.radio("Select a graph to view:", list(graphs.keys()), horizontal=True)
     
     # Display the selected graph
     st.subheader(selected_graph)
     st.image(graphs[selected_graph], use_container_width=True)
     
+    # Consistent insights section
     st.write("""
     ### Key Insights:
     - Number of Bedrooms: More bedrooms increase price, but marginal gains diminish.
@@ -285,31 +234,24 @@ elif section == "Bedrooms/Bathrooms Impact":
     """)
 
 # House Size by City Type section
-elif section == "House Size by City Type":
+elif section == "House Size by City Type ":
     st.header("3. What is the average house size per city types in the U.S.?")
     
     # Define the graphs for this section
     graphs = {
-        "House Size": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20House%20Size%20by%20City%20Type.png",
-        "Property Size": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Property%20Size%20by%20City%20Type.png",
-        "Acre Lot": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Acre%20Lot%20by%20City%20Type.png"
+        "Average House Size by City Type": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20House%20Size%20by%20City%20Type.png",
+        "Average Property Size by City Type": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Property%20Size%20by%20City%20Type.png",
+        "Average Acre Lot by City Type": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Acre%20Lot%20by%20City%20Type.png"
     }
     
     # Create navigation tabs for graphs
-    cols = st.columns(len(graphs))
-    selected_graph = None
-    for i, (graph_name, _) in enumerate(graphs.items()):
-        with cols[i]:
-            if st.button(graph_name, key=f"housesize_{i}"):
-                selected_graph = graph_name
-    
-    # Default to first graph if none selected
-    selected_graph = selected_graph or list(graphs.keys())[0]
+    selected_graph = st.radio("Select a graph to view:", list(graphs.keys()), horizontal=True)
     
     # Display the selected graph
     st.subheader(selected_graph)
     st.image(graphs[selected_graph], use_container_width=True)
     
+    # Consistent insights section
     st.write("""
     ### Key Insights:
     - House Sizes: Larger in towns/small cities (less dense); smaller in metropolises (dense).
@@ -333,27 +275,20 @@ elif section == "Urban/Suburban/Rural Prices":
     
     # Define the graphs for this section
     graphs = {
-        "Property Price": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Property%20Price%20by%20Area%20Type.png",
-        "Property Size": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Property%20Size%20by%20Area%20Type.png",
-        "Population": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Population%20(2024)%20by%20Area%20Type.png",
-        "Population Density": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Population%20Density%20by%20Area%20Type.png"
+        "Average Property Price by Area Type": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Property%20Price%20by%20Area%20Type.png",
+        "Average Property Size by Area Type": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Property%20Size%20by%20Area%20Type.png",
+        "Average Population (2024) by Area Type": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Population%20(2024)%20by%20Area%20Type.png",
+        "Average Population Density by Area Type": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Population%20Density%20by%20Area%20Type.png"
     }
     
     # Create navigation tabs for graphs
-    cols = st.columns(len(graphs))
-    selected_graph = None
-    for i, (graph_name, _) in enumerate(graphs.items()):
-        with cols[i]:
-            if st.button(graph_name, key=f"urban_{i}"):
-                selected_graph = graph_name
-    
-    # Default to first graph if none selected
-    selected_graph = selected_graph or list(graphs.keys())[0]
+    selected_graph = st.radio("Select a graph to view:", list(graphs.keys()), horizontal=True)
     
     # Display the selected graph
     st.subheader(selected_graph)
     st.image(graphs[selected_graph], use_container_width=True)
     
+    # Consistent insights section
     st.write("""
     ### Key Insights:
     - Urban: Highest prices due to high density, limited land, and demand.
