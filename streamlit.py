@@ -158,17 +158,6 @@ st.markdown("""
     .stButton > button {
         width: auto;
     }
-    .button-container {
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-        margin-bottom: 20px;
-        flex-wrap: wrap;
-    }
-    .graph-button-container {
-        min-width: 200px;
-        text-align: center;
-    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -212,15 +201,24 @@ elif section == "Regional Price Differences":
         "Average Density by Region": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Density%20by%20Region.png"
     }
     
-    # Create centered container for buttons
-    st.markdown('<div class="button-container">', unsafe_allow_html=True)
+    # Create centered container for 3 buttons
+    col1, col2, col3 = st.columns([1,1,1])
+    with col1:
+        btn1 = st.button(list(graphs.keys())[0], key="btn1")
+    with col2:
+        btn2 = st.button(list(graphs.keys())[1], key="btn2")
+    with col3:
+        btn3 = st.button(list(graphs.keys())[2], key="btn3")
     
-    selected_graph = list(graphs.keys())[0]  # Default to first graph
-    for graph_title, graph_url in graphs.items():
-        if st.button(graph_title, key=graph_title):
-            selected_graph = graph_title
-    
-    st.markdown('</div>', unsafe_allow_html=True)
+    # Determine which graph to show
+    if btn1:
+        selected_graph = list(graphs.keys())[0]
+    elif btn2:
+        selected_graph = list(graphs.keys())[1]
+    elif btn3:
+        selected_graph = list(graphs.keys())[2]
+    else:
+        selected_graph = list(graphs.keys())[0]  # Default
     
     # Display the selected graph
     st.subheader(selected_graph)
@@ -257,15 +255,24 @@ elif section == "Bedrooms/Bathrooms Impact":
         "Bed/Bath Ratio vs Price": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Bed&Bath%20Ratio%20vs%20Price.png"
     }
     
-    # Create centered container for buttons
-    st.markdown('<div class="button-container">', unsafe_allow_html=True)
+    # Create centered container for 3 buttons
+    col1, col2, col3 = st.columns([1,1,1])
+    with col1:
+        btn1 = st.button(list(graphs.keys())[0], key="btn1")
+    with col2:
+        btn2 = st.button(list(graphs.keys())[1], key="btn2")
+    with col3:
+        btn3 = st.button(list(graphs.keys())[2], key="btn3")
     
-    selected_graph = list(graphs.keys())[0]  # Default to first graph
-    for graph_title, graph_url in graphs.items():
-        if st.button(graph_title, key=graph_title):
-            selected_graph = graph_title
-    
-    st.markdown('</div>', unsafe_allow_html=True)
+    # Determine which graph to show
+    if btn1:
+        selected_graph = list(graphs.keys())[0]
+    elif btn2:
+        selected_graph = list(graphs.keys())[1]
+    elif btn3:
+        selected_graph = list(graphs.keys())[2]
+    else:
+        selected_graph = list(graphs.keys())[0]  # Default
     
     # Display the selected graph
     st.subheader(selected_graph)
@@ -292,15 +299,24 @@ elif section == "House Size by City Type":
         "Acre Lot by City": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Acre%20Lot%20by%20City%20Type.png"
     }
     
-    # Create centered container for buttons
-    st.markdown('<div class="button-container">', unsafe_allow_html=True)
+    # Create centered container for 3 buttons
+    col1, col2, col3 = st.columns([1,1,1])
+    with col1:
+        btn1 = st.button(list(graphs.keys())[0], key="btn1")
+    with col2:
+        btn2 = st.button(list(graphs.keys())[1], key="btn2")
+    with col3:
+        btn3 = st.button(list(graphs.keys())[2], key="btn3")
     
-    selected_graph = list(graphs.keys())[0]  # Default to first graph
-    for graph_title, graph_url in graphs.items():
-        if st.button(graph_title, key=graph_title):
-            selected_graph = graph_title
-    
-    st.markdown('</div>', unsafe_allow_html=True)
+    # Determine which graph to show
+    if btn1:
+        selected_graph = list(graphs.keys())[0]
+    elif btn2:
+        selected_graph = list(graphs.keys())[1]
+    elif btn3:
+        selected_graph = list(graphs.keys())[2]
+    else:
+        selected_graph = list(graphs.keys())[0]  # Default
     
     # Display the selected graph
     st.subheader(selected_graph)
@@ -334,13 +350,28 @@ elif section == "Urban/Suburban/Rural Prices":
         "Density by Area": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Population%20Density%20by%20Area%20Type.png"
     }
     
-    # Create centered container for buttons with 4 columns
-    cols = st.columns(4)
-    selected_graph = list(graphs.keys())[0]  # Default to first graph
-    for i, (graph_title, graph_url) in enumerate(graphs.items()):
-        with cols[i % 4]:
-            if st.button(graph_title, key=graph_title):
-                selected_graph = graph_title
+    # Create centered container for 4 buttons
+    col1, col2, col3, col4 = st.columns([1,1,1,1])
+    with col1:
+        btn1 = st.button(list(graphs.keys())[0], key="btn1")
+    with col2:
+        btn2 = st.button(list(graphs.keys())[1], key="btn2")
+    with col3:
+        btn3 = st.button(list(graphs.keys())[2], key="btn3")
+    with col4:
+        btn4 = st.button(list(graphs.keys())[3], key="btn4")
+    
+    # Determine which graph to show
+    if btn1:
+        selected_graph = list(graphs.keys())[0]
+    elif btn2:
+        selected_graph = list(graphs.keys())[1]
+    elif btn3:
+        selected_graph = list(graphs.keys())[2]
+    elif btn4:
+        selected_graph = list(graphs.keys())[3]
+    else:
+        selected_graph = list(graphs.keys())[0]  # Default
     
     # Display the selected graph
     st.subheader(selected_graph)
