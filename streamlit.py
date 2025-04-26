@@ -220,7 +220,7 @@ elif section == "Bedrooms/Bathrooms Impact":
              use_container_width=True)
     
     st.subheader("Bed/Bath Ratio vs Price")
-    st.image("https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Bed%20&%20Bath%20Ratio%20vs%20Price.png",
+    st.image("https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Bed&Bath%20Ratio%20vs%20Price.png",
              use_container_width=True)
     
     st.write("""
