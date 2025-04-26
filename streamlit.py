@@ -436,8 +436,9 @@ def get_region_for_state(state):
     else:
         return 'Other'
 
+
 def plot_region_map(selected_state_name):
-    # State abbreviation dictionary (assuming it's available globally or pass it in)
+    # State abbreviation dictionary
     state_abbrev = {
         'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA',
         'Colorado': 'CO', 'Connecticut': 'CT', 'Delaware': 'DE', 'Florida': 'FL', 'Georgia': 'GA',
@@ -451,7 +452,6 @@ def plot_region_map(selected_state_name):
         'Virginia': 'VA', 'Washington': 'WA', 'West Virginia': 'WV', 'Wisconsin': 'WI', 'Wyoming': 'WY'
     }
 
-    # Define sets of states for regions
     northeast_states = {
         "Connecticut", "Maine", "Massachusetts", "New Hampshire", "Rhode Island", "Vermont",
         "New Jersey", "New York", "Pennsylvania"
@@ -532,61 +532,36 @@ def plot_region_map(selected_state_name):
             name='Selected State'
         ))
 
-    # Remove axis ticks and labels by hiding geo axes
-    fig.update_geos(
-        visible=False,   # hides axis lines & ticks
-        showcountries=True,
-        showlakes=True,
-        lakecolor='rgb(255, 255, 255)',
-        projection_type='albers usa',
-    )
+    # Legend order updated: West, Midwest, South, Northeast
+    region_names = ['West', 'Midwest', 'South', 'Northeast']
+    region_colors = ['#ab63fa', '#EF553B', '#00cc96', '#636efa']
 
-    # Add a color legend box below the map instead of side legend
-    region_names = ['Northeast', 'Midwest', 'South', 'West']
-    region_colors = ['#636efa', '#EF553B', '#00cc96', '#ab63fa']
-
-    # Add colored rectangles and text below the plot using annotations
-    legend_annotations = []
-    x_start = 0.1
-    x_gap = 0.2
-    y_pos = -0.15  # Position below the map
+    legend_x = 1.05  # position legend outside plot on the right
+    legend_y_start = 0.9
+    legend_y_step = 0.1
 
     for i, (name, color) in enumerate(zip(region_names, region_colors)):
-        x = x_start + i * x_gap
-        # Colored box (square)
-        legend_annotations.append(dict(
-            x=x,
-            y=y_pos,
-            xref='paper',
-            yref='paper',
-            showarrow=False,
-            text="&nbsp;&nbsp;&nbsp;&nbsp;",  # space for colored box
-            bgcolor=color,
-            bordercolor='black',
-            borderwidth=1,
-            borderpad=2,
-            font=dict(size=14),
-            align='center',
-            valign='middle'
-        ))
-        # Text label next to the box
-        legend_annotations.append(dict(
-            x=x + 0.05,
-            y=y_pos,
-            xref='paper',
-            yref='paper',
-            showarrow=False,
-            text=name,
-            font=dict(size=14, color='black'),
-            align='left',
-            valign='middle'
+        fig.add_trace(go.Scatter(
+            x=[legend_x],
+            y=[legend_y_start - i * legend_y_step],
+            mode='markers+text',
+            marker=dict(color=color, size=20, symbol='square'),
+            text=[name],
+            textposition='middle right',
+            showlegend=False,
+            hoverinfo='none',
         ))
 
     fig.update_layout(
-        margin=dict(r=10, t=40, l=10, b=80),
-        annotations=legend_annotations,
+        margin=dict(r=120, t=40, l=0, b=0),
+        geo=dict(
+            scope='usa',
+            projection=go.layout.geo.Projection(type='albers usa'),
+            showlakes=True,
+            lakecolor='rgb(255, 255, 255)'
+        ),
         title_text='US Map Colored by Region with Selected State Highlight',
-        title_x=0.5,
+        title_x=0,  # left align title
     )
 
     return fig
