@@ -590,33 +590,25 @@ if section == "House Price Predictor":
         "rural": 0, "suburban": 1, "urban": 2
     }
 
-    # Always show the map at the top
-    st.subheader("US Map")
-    fig = plot_region_map()
-    st.plotly_chart(fig, use_container_width=True)
-
     st.subheader("Select Geographic Attributes")
 
     # Region dropdown
     regions = sorted(region_state_hierarchy.keys())
-    selected_region = st.selectbox("Select Region", ["Select Region"] + regions, index=0,
-                                 key='region_select')
+    selected_region = st.selectbox("Select Region", ["Select Region"] + regions, index=0)
 
-    # State dropdown - updates when region changes
+    # State dropdown
     states = sorted(region_state_hierarchy[selected_region].keys()) if selected_region != "Select Region" else []
-    selected_state = st.selectbox("Select State", ["Select State"] + states, index=0,
-                                key='state_select')
+    selected_state = st.selectbox("Select State", ["Select State"] + states, index=0)
 
     # Helper to capitalize options for display
     def capitalize_options(options):
         return [opt.title() for opt in options]
 
-    # City Type dropdown with capitalized display options - updates when state changes
+    # City Type dropdown with capitalized display options
     city_types_raw = sorted(region_state_hierarchy[selected_region][selected_state].keys()) \
         if selected_region != "Select Region" and selected_state != "Select State" else []
     city_types_display = capitalize_options(city_types_raw)
-    city_type_choice = st.selectbox("Select City Type", ["Select City Type"] + city_types_display, index=0,
-                                  key='city_type_select')
+    city_type_choice = st.selectbox("Select City Type", ["Select City Type"] + city_types_display, index=0)
 
     # Map back selected display value to lowercase key
     if city_type_choice != "Select City Type":
@@ -624,13 +616,12 @@ if section == "House Price Predictor":
     else:
         selected_city_type_label = "Select City Type"
 
-    # Area Type dropdown with capitalized display options - updates when city type changes
+    # Area Type dropdown with capitalized display options
     area_types_raw = sorted(
         region_state_hierarchy[selected_region][selected_state].get(selected_city_type_label, {}).keys()
     ) if (selected_region != "Select Region" and selected_state != "Select State" and selected_city_type_label != "Select City Type") else []
     area_types_display = capitalize_options(area_types_raw)
-    area_type_choice = st.selectbox("Select Area Type", ["Select Area Type"] + area_types_display, index=0,
-                                   key='area_type_select')
+    area_type_choice = st.selectbox("Select Area Type", ["Select Area Type"] + area_types_display, index=0)
 
     if area_type_choice != "Select Area Type":
         selected_area_type_label = area_type_choice.lower()
@@ -641,7 +632,7 @@ if section == "House Price Predictor":
     selected_city_type = city_type_map.get(selected_city_type_label, 0)
     selected_area_type = area_type_map.get(selected_area_type_label, 0)
 
-    # City dropdown - updates when area type changes
+    # City dropdown
     cities = []
     if (selected_region != "Select Region" and selected_state != "Select State" and 
         selected_city_type_label != "Select City Type" and selected_area_type_label != "Select Area Type"):
@@ -653,15 +644,15 @@ if section == "House Price Predictor":
         except (KeyError, TypeError) as e:
             st.error(f"Error loading cities: {e}")
     cities = sorted(cities) if cities else ["No cities available"]
-    selected_city = st.selectbox("Select City", ["Select City"] + cities, index=0,
-                               key='city_select')
+    selected_city = st.selectbox("Select City", ["Select City"] + cities, index=0)
 
-    # Update the map after every input change
-    fig = plot_region_map(
-        selected_state if selected_state != "Select State" else None,
-        selected_city if selected_city != "Select City" else None
-    )
-    st.plotly_chart(fig, use_container_width=True)
+    # Show map after city selection with the selected city point
+    if selected_state != "Select State" and selected_city != "Select City":
+        fig = plot_region_map(
+            selected_state if selected_state != "Select State" else None,
+            selected_city if selected_city != "Select City" else None
+        )
+        st.plotly_chart(fig, use_container_width=True)
 
     # Input property info
     st.subheader("Input House Details")
