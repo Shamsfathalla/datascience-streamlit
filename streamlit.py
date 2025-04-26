@@ -600,10 +600,6 @@ if section == "House Price Predictor":
     states = sorted(region_state_hierarchy[selected_region].keys()) if selected_region != "Select Region" else []
     selected_state = st.selectbox("Select State", ["Select State"] + states, index=0)
 
-    # Always show map (no else)
-    fig = plot_region_map(selected_state if selected_state != "Select State" else None)
-    st.plotly_chart(fig, use_container_width=True)
-
     # Helper to capitalize options for display
     def capitalize_options(options):
         return [opt.title() for opt in options]
@@ -649,6 +645,14 @@ if section == "House Price Predictor":
             st.error(f"Error loading cities: {e}")
     cities = sorted(cities) if cities else ["No cities available"]
     selected_city = st.selectbox("Select City", ["Select City"] + cities, index=0)
+
+    # Show map after city selection with the selected city point
+    if selected_state != "Select State" and selected_city != "Select City":
+        fig = plot_region_map(
+            selected_state if selected_state != "Select State" else None,
+            selected_city if selected_city != "Select City" else None
+        )
+        st.plotly_chart(fig, use_container_width=True)
 
     # Input property info
     st.subheader("Input House Details")
