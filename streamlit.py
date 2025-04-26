@@ -391,7 +391,14 @@ elif section == "Urban/Suburban/Rural Prices":
     - Prices increase from rural to suburban to urban due to density, land availability, and amenities.
     """)
 
-# State name to abbreviation mapping
+import streamlit as st
+import pandas as pd
+import numpy as np
+import plotly.graph_objects as go
+import plotly.express as px
+from geopy.geocoders import Nominatim
+
+# State abbreviation dictionary (single definition)
 state_abbrev = {
     'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA',
     'Colorado': 'CO', 'Connecticut': 'CT', 'Delaware': 'DE', 'Florida': 'FL', 'Georgia': 'GA',
@@ -405,23 +412,20 @@ state_abbrev = {
     'Virginia': 'VA', 'Washington': 'WA', 'West Virginia': 'WV', 'Wisconsin': 'WI', 'Wyoming': 'WY'
 }
 
-# Define your regions
+# Region sets (single definition)
 northeast_states = {
     "Connecticut", "Maine", "Massachusetts", "New Hampshire", "Rhode Island", "Vermont",
     "New Jersey", "New York", "Pennsylvania"
 }
-
 midwest_states = {
     "Illinois", "Indiana", "Iowa", "Kansas", "Michigan", "Minnesota", "Missouri", "Nebraska",
     "North Dakota", "Ohio", "South Dakota", "Wisconsin"
 }
-
 south_states = {
     "Alabama", "Arkansas", "Delaware", "Florida", "Georgia", "Kentucky", "Louisiana", "Maryland",
     "Mississippi", "North Carolina", "Oklahoma", "South Carolina", "Tennessee", "Texas",
     "Virginia", "West Virginia"
 }
-
 west_states = {
     "Alaska", "Arizona", "California", "Colorado", "Hawaii", "Idaho", "Montana", "Nevada",
     "New Mexico", "Oregon", "Utah", "Washington", "Wyoming"
@@ -439,56 +443,11 @@ def get_region_for_state(state):
     else:
         return 'Other'
 
-def plot_region_map(selected_state_name):
-    # State abbreviation dictionary
-    state_abbrev = {
-        'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA',
-        'Colorado': 'CO', 'Connecticut': 'CT', 'Delaware': 'DE', 'Florida': 'FL', 'Georgia': 'GA',
-        'Hawaii': 'HI', 'Idaho': 'ID', 'Illinois': 'IL', 'Indiana': 'IN', 'Iowa': 'IA',
-        'Kansas': 'KS', 'Kentucky': 'KY', 'Louisiana': 'LA', 'Maine': 'ME', 'Maryland': 'MD',
-        'Massachusetts': 'MA', 'Michigan': 'MI', 'Minnesota': 'MN', 'Mississippi': 'MS', 'Missouri': 'MO',
-        'Montana': 'MT', 'Nebraska': 'NE', 'Nevada': 'NV', 'New Hampshire': 'NH', 'New Jersey': 'NJ',
-        'New Mexico': 'NM', 'New York': 'NY', 'North Carolina': 'NC', 'North Dakota': 'ND', 'Ohio': 'OH',
-        'Oklahoma': 'OK', 'Oregon': 'OR', 'Pennsylvania': 'PA', 'Rhode Island': 'RI', 'South Carolina': 'SC',
-        'South Dakota': 'SD', 'Tennessee': 'TN', 'Texas': 'TX', 'Utah': 'UT', 'Vermont': 'VT',
-        'Virginia': 'VA', 'Washington': 'WA', 'West Virginia': 'WV', 'Wisconsin': 'WI', 'Wyoming': 'WY'
-    }
 
-    # Define sets of states for regions
-    northeast_states = {
-        "Connecticut", "Maine", "Massachusetts", "New Hampshire", "Rhode Island", "Vermont",
-        "New Jersey", "New York", "Pennsylvania"
-    }
-    midwest_states = {
-        "Illinois", "Indiana", "Iowa", "Kansas", "Michigan", "Minnesota", "Missouri", "Nebraska",
-        "North Dakota", "Ohio", "South Dakota", "Wisconsin"
-    }
-    south_states = {
-        "Alabama", "Arkansas", "Delaware", "Florida", "Georgia", "Kentucky", "Louisiana", "Maryland",
-        "Mississippi", "North Carolina", "Oklahoma", "South Carolina", "Tennessee", "Texas",
-        "Virginia", "West Virginia"
-    }
-    west_states = {
-        "Alaska", "Arizona", "California", "Colorado", "Hawaii", "Idaho", "Montana", "Nevada",
-        "New Mexico", "Oregon", "Utah", "Washington", "Wyoming"
-    }
-
-    def get_region_for_state(state):
-        if state in northeast_states:
-            return 'Northeast'
-        elif state in midwest_states:
-            return 'Midwest'
-        elif state in south_states:
-            return 'South'
-        elif state in west_states:
-            return 'West'
-        else:
-            return 'Other'
-
+def plot_region_map(selected_state_name=None):
     states_codes = list(state_abbrev.values())
     states_names = list(state_abbrev.keys())
 
-    # Reordered region_color_map to match West, Midwest, South, Northeast
     region_color_map = {
         'West': 0,
         'Midwest': 1,
@@ -497,7 +456,6 @@ def plot_region_map(selected_state_name):
         'Other': 4
     }
 
-    # Reordered colorscale accordingly
     colorscale = [
         [0.0, '#ab63fa'],   # West - purple
         [0.25, '#ab63fa'],
@@ -523,7 +481,7 @@ def plot_region_map(selected_state_name):
         zmax=3
     ))
 
-    if selected_state_name in state_abbrev:
+    if selected_state_name and selected_state_name in state_abbrev:
         selected_code = state_abbrev[selected_state_name]
         fig.add_trace(go.Choropleth(
             locations=[selected_code],
@@ -538,32 +496,30 @@ def plot_region_map(selected_state_name):
         ))
 
     fig.update_geos(
-        visible=False,   # hides axis lines & ticks
+        visible=False,
         showcountries=True,
         showlakes=True,
         lakecolor='rgb(255, 255, 255)',
         projection_type='albers usa',
     )
 
-    # Legend order updated
     region_names = ['West', 'Midwest', 'South', 'Northeast']
     region_colors = ['#ab63fa', '#EF553B', '#00cc96', '#636efa']
 
     legend_annotations = []
     x_start = 0.1
     x_gap = 0.2
-    y_pos = -0.15  # Position below the map
+    y_pos = -0.15
 
     for i, (name, color) in enumerate(zip(region_names, region_colors)):
         x = x_start + i * x_gap
-        # Colored box (square)
         legend_annotations.append(dict(
             x=x,
             y=y_pos,
             xref='paper',
             yref='paper',
             showarrow=False,
-            text="&nbsp;&nbsp;&nbsp;&nbsp;",  # space for colored box
+            text="&nbsp;&nbsp;&nbsp;&nbsp;",  # colored box
             bgcolor=color,
             bordercolor='black',
             borderwidth=1,
@@ -572,7 +528,6 @@ def plot_region_map(selected_state_name):
             align='center',
             valign='middle'
         ))
-        # Text label next to the box, now white
         legend_annotations.append(dict(
             x=x + 0.05,
             y=y_pos,
@@ -580,7 +535,7 @@ def plot_region_map(selected_state_name):
             yref='paper',
             showarrow=False,
             text=name,
-            font=dict(size=14, color='white'),  # <-- white text color here
+            font=dict(size=14, color='white'),
             align='left',
             valign='middle'
         ))
@@ -589,72 +544,53 @@ def plot_region_map(selected_state_name):
         margin=dict(r=10, t=40, l=10, b=80),
         annotations=legend_annotations,
         title_text='US Map Colored by Region with Selected State Highlight',
-        title_x=0,  # Left align the title
-        plot_bgcolor='rgba(0,0,0,0)',  # transparent background (optional)
-        paper_bgcolor='rgba(0,0,0,0)', # transparent paper background (optional)
+        title_x=0,
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)',
     )
 
     return fig
 
+
+# House Price Predictor UI code (inside Streamlit app section)
 if section == "House Price Predictor":
     st.header("5. Predict House Price")
     st.write("Enter the details below to predict the house price based on property size, bedrooms, bathrooms, region, city type, area type, and city.")
 
-    # Use lowercase keys for mapping to ensure consistent lookup
-    city_type_map = {
-        "town": 0, "small city": 1, "medium city": 2, "large city": 3, "metropolis": 4
-    }
-    area_type_map = {
-        "rural": 0, "suburban": 1, "urban": 2
-    }
+    city_type_map = {"town": 0, "small city": 1, "medium city": 2, "large city": 3, "metropolis": 4}
+    area_type_map = {"rural": 0, "suburban": 1, "urban": 2}
 
     st.subheader("Select Geographic Attributes")
 
-    # Region dropdown
     regions = sorted(region_state_hierarchy.keys())
     selected_region = st.selectbox("Select Region", ["Select Region"] + regions, index=0)
 
-    # State dropdown
     states = sorted(region_state_hierarchy[selected_region].keys()) if selected_region != "Select Region" else []
     selected_state = st.selectbox("Select State", ["Select State"] + states, index=0)
 
-    # Always show map (no else)
     fig = plot_region_map(selected_state if selected_state != "Select State" else None)
     st.plotly_chart(fig, use_container_width=True)
 
-    # Helper to capitalize options for display
     def capitalize_options(options):
         return [opt.title() for opt in options]
 
-    # City Type dropdown with capitalized display options
-    city_types_raw = sorted(region_state_hierarchy[selected_region][selected_state].keys()) \
-        if selected_region != "Select Region" and selected_state != "Select State" else []
+    city_types_raw = sorted(region_state_hierarchy[selected_region][selected_state].keys()) if (selected_region != "Select Region" and selected_state != "Select State") else []
     city_types_display = capitalize_options(city_types_raw)
     city_type_choice = st.selectbox("Select City Type", ["Select City Type"] + city_types_display, index=0)
 
-    # Map back selected display value to lowercase key
-    if city_type_choice != "Select City Type":
-        selected_city_type_label = city_type_choice.lower()
-    else:
-        selected_city_type_label = "Select City Type"
+    selected_city_type_label = city_type_choice.lower() if city_type_choice != "Select City Type" else "Select City Type"
 
-    # Area Type dropdown with capitalized display options
     area_types_raw = sorted(
         region_state_hierarchy[selected_region][selected_state].get(selected_city_type_label, {}).keys()
     ) if (selected_region != "Select Region" and selected_state != "Select State" and selected_city_type_label != "Select City Type") else []
     area_types_display = capitalize_options(area_types_raw)
     area_type_choice = st.selectbox("Select Area Type", ["Select Area Type"] + area_types_display, index=0)
 
-    if area_type_choice != "Select Area Type":
-        selected_area_type_label = area_type_choice.lower()
-    else:
-        selected_area_type_label = "Select Area Type"
+    selected_area_type_label = area_type_choice.lower() if area_type_choice != "Select Area Type" else "Select Area Type"
 
-    # Convert selections to numeric codes for model
     selected_city_type = city_type_map.get(selected_city_type_label, 0)
     selected_area_type = area_type_map.get(selected_area_type_label, 0)
 
-    # City dropdown
     cities = []
     if (selected_region != "Select Region" and selected_state != "Select State" and
         selected_city_type_label != "Select City Type" and selected_area_type_label != "Select Area Type"):
@@ -668,6 +604,7 @@ if section == "House Price Predictor":
     cities = sorted(cities) if cities else ["No cities available"]
     selected_city = st.selectbox("Select City", ["Select City"] + cities, index=0)
 
+
 def get_city_coords(city, state=None, country="USA"):
     geolocator = Nominatim(user_agent="house_price_app")
     location_query = city
@@ -679,8 +616,8 @@ def get_city_coords(city, state=None, country="USA"):
         return location.latitude, location.longitude
     return None, None
 
+
 def plot_us_map_with_pin(lat, lon, city):
-    # Center on US roughly (lat=39, lon=-98), zoomed out
     fig = px.scatter_mapbox(
         lat=[lat],
         lon=[lon],
@@ -691,6 +628,7 @@ def plot_us_map_with_pin(lat, lon, city):
         title=f"US Map with {city} Location"
     )
     return fig
+
 
 def plot_city_map(city, lat, lon):
     fig = px.scatter_mapbox(
@@ -708,19 +646,16 @@ def plot_city_map(city, lat, lon):
 if selected_city not in ["Select City", "No cities available"]:
     lat, lon = get_city_coords(selected_city, selected_state)
     if lat and lon:
-        # Plot US map with city pin
         us_map_fig = plot_us_map_with_pin(lat, lon, selected_city)
         st.subheader("US Map with City Location")
         st.plotly_chart(us_map_fig, use_container_width=True)
 
-        # Plot zoomed-in city map below
         city_map_fig = plot_city_map(selected_city, lat, lon)
         st.subheader(f"Zoomed-in Map of {selected_city}")
         st.plotly_chart(city_map_fig, use_container_width=True)
     else:
         st.error("Sorry, could not find coordinates for the selected city.")
 
-    # Input property info
     st.subheader("Input House Details")
     col1, col2 = st.columns(2)
     with col1:
@@ -729,60 +664,15 @@ if selected_city not in ["Select City", "No cities available"]:
     with col2:
         bath = st.number_input("Number of Bathrooms", min_value=1, max_value=20, value=1, step=1)
 
-    if st.button("Predict House Price"):
-        bed_bath_ratio = bed / bath if bath != 0 else 1.0
-        input_data = {
-            'property_size': property_size,
-            'bed': bed,
-            'bath': bath,
-            'bed_bath_ratio': bed_bath_ratio,
-            'city_type': selected_city_type,
-            'area_type': selected_area_type,
-            'region_Midwest': 1 if selected_region == 'Midwest' else 0,
-            'region_Northeast': 1 if selected_region == 'Northeast' else 0,
-            'region_South': 1 if selected_region == 'South' else 0,
-            'region_West': 1 if selected_region == 'West' else 0,
-        }
-        input_df = pd.DataFrame([input_data])
+    # Map city and area type labels to codes for model input
+    city_type_code = city_type_map.get(selected_city_type_label, 0)
+    area_type_code = area_type_map.get(selected_area_type_label, 0)
 
-        # Transform numerical features
-        for col in ['property_size', 'bed_bath_ratio']:
-            if col in input_df.columns and col in power_transformers:
-                input_df[col] = np.log1p(input_df[col])
-                input_df[col] = power_transformers[col].transform(input_df[[col]])
-                input_df[col] = scalers[col].transform(input_df[[col]])
+    # You can use these inputs to call your model for prediction, e.g.:
+    # price_pred = model.predict([[property_size, bed, bath, region_code, state_code, city_type_code, area_type_code, city_code]])
+    # st.write(f"Predicted House Price: ${price_pred:.2f}")
 
-        # Add missing features with defaults
-        model_features = ['bed', 'bath', 'acre_lot', 'house_size', 'population_2024', 'density',
-                          'city_type', 'area_type', 'property_size', 'bed_bath_ratio',
-                          'region_Midwest', 'region_Northeast', 'region_South', 'region_West']
-        for feature in model_features:
-            if feature not in input_df.columns:
-                if feature in df.columns:
-                    median_value = df[feature].median()
-                    if feature in power_transformers and feature not in ['bed', 'bath']:
-                        median_df = pd.DataFrame({feature: [median_value]})
-                        median_df[feature] = np.log1p(median_df[feature])
-                        median_df[feature] = power_transformers[feature].transform(median_df[[feature]])[0][0]
-                        if feature in scalers:
-                            median_df[feature] = scalers[feature].transform(median_df[[feature]])[0][0]
-                        input_df[feature] = median_df[feature]
-                    else:
-                        input_df[feature] = median_value
-                else:
-                    input_df[feature] = 0
-        input_df = input_df[model_features]
+else:
+    st.info("Please select all geographic options to proceed.")
 
-        # Predict and inverse-transform the price
-        try:
-            prediction = model.predict(input_df)[0]
-            if 'price' in power_transformers:
-                unscaled_prediction = scalers['price'].inverse_transform([[prediction]])[0][0]
-                untransformed_prediction = power_transformers['price'].inverse_transform([[unscaled_prediction]])[0][0]
-                final_prediction = np.expm1(untransformed_prediction)
-            else:
-                final_prediction = prediction
-            st.success(f"**Predicted House Price in {selected_city}:** ${final_prediction:,.2f}")
-        except Exception as e:
-            st.error(f"Prediction error: {str(e)}")
 
