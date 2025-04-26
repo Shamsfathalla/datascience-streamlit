@@ -8,6 +8,7 @@ import joblib
 import json
 from sklearn.preprocessing import MinMaxScaler, PowerTransformer
 import plotly.graph_objects as go
+from geopy.geocoders import Nominatim
 
 # Set page config (must be first Streamlit command)
 st.set_page_config(page_title="U.S. Housing Market Analysis", layout="wide")
