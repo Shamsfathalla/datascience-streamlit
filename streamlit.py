@@ -151,12 +151,21 @@ st.markdown("""
         font-size: 14px;
         display: inline-block;
         text-align: center;
+        flex: 1;
+        min-width: 0;
     }
     .graph-button:hover {
         background-color: rgb(50, 51, 60);
     }
     .stButton > button {
         width: auto;
+    }
+    .button-container {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -202,19 +211,17 @@ elif section == "Regional Price Differences":
     }
     
     # Create centered container for buttons
-    st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
-    cols = st.columns(len(graphs))
+    st.markdown('<div class="button-container">', unsafe_allow_html=True)
     selected_graph = list(graphs.keys())[0]  # Default to first graph
-    for i, (graph_title, graph_url) in enumerate(graphs.items()):
-        with cols[i]:
-            if st.button(graph_title, key=graph_title, help=graph_title):
-                selected_graph = graph_title
-            st.markdown(f"""
-                <script>
-                document.querySelector('button[title="{graph_title}"]').classList.add('graph-button');
-                </script>
-            """, unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
+    for graph_title, graph_url in graphs.items():
+        if st.button(graph_title, key=graph_title, help=graph_title):
+            selected_graph = graph_title
+        st.markdown(f"""
+            <script>
+            document.querySelector('button[title="{graph_title}"]').classList.add('graph-button');
+            </script>
+        """, unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
     
     # Display the selected graph
     st.subheader(selected_graph)
@@ -252,19 +259,17 @@ elif section == "Bedrooms/Bathrooms Impact":
     }
     
     # Create centered container for buttons
-    st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
-    cols = st.columns(len(graphs))
+    st.markdown('<div class="button-container">', unsafe_allow_html=True)
     selected_graph = list(graphs.keys())[0]  # Default to first graph
-    for i, (graph_title, graph_url) in enumerate(graphs.items()):
-        with cols[i]:
-            if st.button(graph_title, key=graph_title, help=graph_title):
-                selected_graph = graph_title
-            st.markdown(f"""
-                <script>
-                document.querySelector('button[title="{graph_title}"]').classList.add('graph-button');
-                </script>
-            """, unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
+    for graph_title, graph_url in graphs.items():
+        if st.button(graph_title, key=graph_title, help=graph_title):
+            selected_graph = graph_title
+        st.markdown(f"""
+            <script>
+            document.querySelector('button[title="{graph_title}"]').classList.add('graph-button');
+            </script>
+        """, unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
     
     # Display the selected graph
     st.subheader(selected_graph)
@@ -293,19 +298,17 @@ elif section == "House Size by City Type ":
     }
     
     # Create centered container for buttons
-    st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
-    cols = st.columns(len(graphs))
+    st.markdown('<div class="button-container">', unsafe_allow_html=True)
     selected_graph = list(graphs.keys())[0]  # Default to first graph
-    for i, (graph_title, graph_url) in enumerate(graphs.items()):
-        with cols[i]:
-            if st.button(graph_title, key=graph_title, help=graph_title):
-                selected_graph = graph_title
-            st.markdown(f"""
-                <script>
-                document.querySelector('button[title="{graph_title}"]').classList.add('graph-button');
-                </script>
-            """, unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
+    for graph_title, graph_url in graphs.items():
+        if st.button(graph_title, key=graph_title, help=graph_title):
+            selected_graph = graph_title
+        st.markdown(f"""
+            <script>
+            document.querySelector('button[title="{graph_title}"]').classList.add('graph-button');
+            </script>
+        """, unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
     
     # Display the selected graph
     st.subheader(selected_graph)
@@ -342,19 +345,17 @@ elif section == "Urban/Suburban/Rural Prices":
     }
     
     # Create centered container for buttons
-    st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
-    cols = st.columns(len(graphs))
+    st.markdown('<div class="button-container">', unsafe_allow_html=True)
     selected_graph = list(graphs.keys())[0]  # Default to first graph
-    for i, (graph_title, graph_url) in enumerate(graphs.items()):
-        with cols[i]:
-            if st.button(graph_title, key=graph_title, help=graph_title):
-                selected_graph = graph_title
-            st.markdown(f"""
-                <script>
-                document.querySelector('button[title="{graph_title}"]').classList.add('graph-button');
-                </script>
-            """, unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
+    for graph_title, graph_url in graphs.items():
+        if st.button(graph_title, key=graph_title, help=graph_title):
+            selected_graph = graph_title
+        st.markdown(f"""
+            <script>
+            document.querySelector('button[title="{graph_title}"]').classList.add('graph-button');
+            </script>
+        """, unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
     
     # Display the selected graph
     st.subheader(selected_graph)
@@ -374,13 +375,21 @@ elif section == "Urban/Suburban/Rural Prices":
 elif section == "House Price Predictor":
     st.header("5. Predict House Price")
     st.write("Enter the details below to predict the house price based on property size, bedrooms, bathrooms, region, city type, area type, and city.")
-    # Map numerical codes to labels
+    
+    # Map numerical codes to labels with capitalized options
     city_type_map = {
-        "Town": 0, "Small City": 1, "Medium City": 2, "Large City": 3, "Metropolis": 4
+        "Town": 0, 
+        "Small City": 1, 
+        "Medium City": 2, 
+        "Large City": 3, 
+        "Metropolis": 4
     }
     area_type_map = {
-        "Rural": 0, "Suburban": 1, "Urban": 2
+        "Rural": 0, 
+        "Suburban": 1, 
+        "Urban": 2
     }
+    
     st.subheader("Select Geographic Attributes")
     # Region dropdown
     regions = sorted(region_state_hierarchy.keys())
@@ -390,19 +399,16 @@ elif section == "House Price Predictor":
     states = sorted(region_state_hierarchy[selected_region].keys()) if selected_region != "Select Region" else []
     selected_state = st.selectbox("Select State", ["Select State"] + states, index=0)
     
-    # City Type dropdown
-    city_types = sorted(region_state_hierarchy[selected_region][selected_state].keys()) \
-        if selected_region != "Select Region" and selected_state != "Select State" else []
+    # City Type dropdown with capitalized options
+    city_types = list(city_type_map.keys())
     selected_city_type_label = st.selectbox("Select City Type", ["Select City Type"] + city_types, index=0)
     
-    # Area Type dropdown
-    area_types = sorted(
-        region_state_hierarchy[selected_region][selected_state][selected_city_type_label].keys()
-    ) if (selected_region != "Select Region" and selected_state != "Select State" and selected_city_type_label != "Select City Type") else []
+    # Area Type dropdown with capitalized options
+    area_types = list(area_type_map.keys())
     selected_area_type_label = st.selectbox("Select Area Type", ["Select Area Type"] + area_types, index=0)
 
     selected_city_type = city_type_map.get(selected_city_type_label, 0)
-    selected_area_type = area_type_map.get(selected_area_type_label.lower(), 0)
+    selected_area_type = area_type_map.get(selected_area_type_label, 0)
     
     # City dropdown
     cities = []
@@ -426,6 +432,7 @@ elif section == "House Price Predictor":
         bed = st.number_input("Number of Bedrooms", min_value=1, max_value=20, value=1, step=1)
     with col2:
         bath = st.number_input("Number of Bathrooms", min_value=1, max_value=20, value=1, step=1)
+    
     if st.button("Predict House Price"):
         bed_bath_ratio = bed / bath if bath != 0 else 1.0
         input_data = {
