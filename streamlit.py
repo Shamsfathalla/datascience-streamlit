@@ -437,6 +437,8 @@ def get_region_for_state(state):
         return 'Other'
 
 
+import plotly.graph_objects as go
+
 def plot_region_map(selected_state_name):
     # State abbreviation dictionary
     state_abbrev = {
@@ -570,7 +572,7 @@ def plot_region_map(selected_state_name):
             align='center',
             valign='middle'
         ))
-        # Text label next to the box
+        # Text label next to the box, now white
         legend_annotations.append(dict(
             x=x + 0.05,
             y=y_pos,
@@ -578,7 +580,7 @@ def plot_region_map(selected_state_name):
             yref='paper',
             showarrow=False,
             text=name,
-            font=dict(size=14, color='black'),
+            font=dict(size=14, color='white'),  # <-- white text color here
             align='left',
             valign='middle'
         ))
@@ -588,6 +590,8 @@ def plot_region_map(selected_state_name):
         annotations=legend_annotations,
         title_text='US Map Colored by Region with Selected State Highlight',
         title_x=0,  # Left align the title
+        plot_bgcolor='rgba(0,0,0,0)',  # transparent background (optional)
+        paper_bgcolor='rgba(0,0,0,0)', # transparent paper background (optional)
     )
 
     return fig
