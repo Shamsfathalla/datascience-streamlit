@@ -11,41 +11,6 @@ from sklearn.preprocessing import MinMaxScaler, PowerTransformer
 # Set page config (must be first Streamlit command)
 st.set_page_config(page_title="U.S. Housing Market Analysis", layout="wide")
 
-# Custom CSS for the navigation buttons
-st.markdown("""
-<style>
-    /* Style for the navigation buttons */
-    .stRadio > div {
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-    }
-    
-    .stRadio [role=radiogroup] {
-        align-items: center;
-        gap: 10px;
-    }
-    
-    .stRadio [role=radio] {
-        background-color: #f0f2f6;
-        padding: 8px 16px;
-        border-radius: 4px;
-        border: 1px solid #d6d6d6;
-        transition: all 0.3s;
-    }
-    
-    .stRadio [role=radio][aria-checked=true] {
-        background-color: #1f77b4;
-        color: white;
-        border-color: #1f77b4;
-    }
-    
-    .stRadio [role=radio]:hover {
-        border-color: #1f77b4;
-    }
-</style>
-""", unsafe_allow_html=True)
-
 # Initialize session state to track dataset, model, and hierarchy loading
 if 'dataset_loaded' not in st.session_state:
     st.session_state.dataset_loaded = False
@@ -207,15 +172,16 @@ elif section == "Regional Price Differences":
     
     # Define the graphs for this section
     graphs = {
-        "Price by Region": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Property%20Price%20by%20Region.png",
-        "Population by Region": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Population%20in%202024%20by%20Region.png",
-        "Density by Region": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Density%20by%20Region.png"
+        "Average Property Price by Region": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Property%20Price%20by%20Region.png",
+        "Average Population in 2024 by Region": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Population%20in%202024%20by%20Region.png",
+        "Average Density by Region": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Density%20by%20Region.png"
     }
     
     # Create navigation tabs for graphs
-    selected_graph = st.radio("", list(graphs.keys()), horizontal=True, label_visibility="collapsed")
+    selected_graph = st.radio("Select a graph to view:", list(graphs.keys()), horizontal=True)
     
     # Display the selected graph
+    st.subheader(selected_graph)
     st.image(graphs[selected_graph], use_container_width=True)
     
     # Consistent insights section
@@ -244,15 +210,16 @@ elif section == "Bedrooms/Bathrooms Impact":
     
     # Define the graphs for this section
     graphs = {
-        "Bedrooms": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Bedrooms%20vs%20Price.png",
-        "Bathrooms": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Bathrooms%20vs%20Price.png",
-        "Bed/Bath Ratio": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Bed&Bath%20Ratio%20vs%20Price.png"
+        "Bedrooms vs Price": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Bedrooms%20vs%20Price.png",
+        "Bathrooms vs Price": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Bathrooms%20vs%20Price.png",
+        "Bed/Bath Ratio vs Price": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Bed&Bath%20Ratio%20vs%20Price.png"
     }
     
     # Create navigation tabs for graphs
-    selected_graph = st.radio("", list(graphs.keys()), horizontal=True, label_visibility="collapsed")
+    selected_graph = st.radio("Select a graph to view:", list(graphs.keys()), horizontal=True)
     
     # Display the selected graph
+    st.subheader(selected_graph)
     st.image(graphs[selected_graph], use_container_width=True)
     
     # Consistent insights section
@@ -272,15 +239,16 @@ elif section == "House Size by City Type ":
     
     # Define the graphs for this section
     graphs = {
-        "House Size": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20House%20Size%20by%20City%20Type.png",
-        "Property Size": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Property%20Size%20by%20City%20Type.png",
-        "Acre Lot": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Acre%20Lot%20by%20City%20Type.png"
+        "Average House Size by City Type": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20House%20Size%20by%20City%20Type.png",
+        "Average Property Size by City Type": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Property%20Size%20by%20City%20Type.png",
+        "Average Acre Lot by City Type": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Acre%20Lot%20by%20City%20Type.png"
     }
     
     # Create navigation tabs for graphs
-    selected_graph = st.radio("", list(graphs.keys()), horizontal=True, label_visibility="collapsed")
+    selected_graph = st.radio("Select a graph to view:", list(graphs.keys()), horizontal=True)
     
     # Display the selected graph
+    st.subheader(selected_graph)
     st.image(graphs[selected_graph], use_container_width=True)
     
     # Consistent insights section
@@ -307,16 +275,17 @@ elif section == "Urban/Suburban/Rural Prices":
     
     # Define the graphs for this section
     graphs = {
-        "Price": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Property%20Price%20by%20Area%20Type.png",
-        "Property Size": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Property%20Size%20by%20Area%20Type.png",
-        "Population": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Population%20(2024)%20by%20Area%20Type.png",
-        "Density": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Population%20Density%20by%20Area%20Type.png"
+        "Average Property Price by Area Type": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Property%20Price%20by%20Area%20Type.png",
+        "Average Property Size by Area Type": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Property%20Size%20by%20Area%20Type.png",
+        "Average Population (2024) by Area Type": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Population%20(2024)%20by%20Area%20Type.png",
+        "Average Population Density by Area Type": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Population%20Density%20by%20Area%20Type.png"
     }
     
     # Create navigation tabs for graphs
-    selected_graph = st.radio("", list(graphs.keys()), horizontal=True, label_visibility="collapsed")
+    selected_graph = st.radio("Select a graph to view:", list(graphs.keys()), horizontal=True)
     
     # Display the selected graph
+    st.subheader(selected_graph)
     st.image(graphs[selected_graph], use_container_width=True)
     
     # Consistent insights section
