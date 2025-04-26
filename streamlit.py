@@ -436,9 +436,6 @@ def get_region_for_state(state):
     else:
         return 'Other'
 
-
-import plotly.graph_objects as go
-
 def plot_region_map(selected_state_name):
     # State abbreviation dictionary
     state_abbrev = {
@@ -622,20 +619,37 @@ if section == "House Price Predictor":
     fig = plot_region_map(selected_state if selected_state != "Select State" else None)
     st.plotly_chart(fig, use_container_width=True)
 
-    # City Type dropdown
-    city_types = sorted(region_state_hierarchy[selected_region][selected_state].keys()) \
+    # Helper to capitalize options for display
+    def capitalize_options(options):
+        return [opt.title() for opt in options]
+
+    # City Type dropdown with capitalized display options
+    city_types_raw = sorted(region_state_hierarchy[selected_region][selected_state].keys()) \
         if selected_region != "Select Region" and selected_state != "Select State" else []
-    selected_city_type_label = st.selectbox("Select City Type", ["Select City Type"] + city_types, index=0)
+    city_types_display = capitalize_options(city_types_raw)
+    city_type_choice = st.selectbox("Select City Type", ["Select City Type"] + city_types_display, index=0)
 
-    # Area Type dropdown
-    area_types = sorted(
-        region_state_hierarchy[selected_region][selected_state][selected_city_type_label].keys()
+    # Map back selected display value to lowercase key
+    if city_type_choice != "Select City Type":
+        selected_city_type_label = city_type_choice.lower()
+    else:
+        selected_city_type_label = "Select City Type"
+
+    # Area Type dropdown with capitalized display options
+    area_types_raw = sorted(
+        region_state_hierarchy[selected_region][selected_state].get(selected_city_type_label, {}).keys()
     ) if (selected_region != "Select Region" and selected_state != "Select State" and selected_city_type_label != "Select City Type") else []
-    selected_area_type_label = st.selectbox("Select Area Type", ["Select Area Type"] + area_types, index=0)
+    area_types_display = capitalize_options(area_types_raw)
+    area_type_choice = st.selectbox("Select Area Type", ["Select Area Type"] + area_types_display, index=0)
 
-    # Convert selections to lowercase for mapping to model input codes
-    selected_city_type = city_type_map.get(selected_city_type_label.lower(), 0)
-    selected_area_type = area_type_map.get(selected_area_type_label.lower(), 0)
+    if area_type_choice != "Select Area Type":
+        selected_area_type_label = area_type_choice.lower()
+    else:
+        selected_area_type_label = "Select Area Type"
+
+    # Convert selections to numeric codes for model
+    selected_city_type = city_type_map.get(selected_city_type_label, 0)
+    selected_area_type = area_type_map.get(selected_area_type_label, 0)
 
     # City dropdown
     cities = []
