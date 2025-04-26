@@ -388,7 +388,9 @@ elif section == "Urban/Suburban/Rural Prices":
     - Prices increase from rural to suburban to urban due to density, land availability, and amenities.
     """)
 
-# State name to abbreviation mapping
+import plotly.graph_objects as go
+from geopy.geocoders import Nominatim
+
 state_abbrev = {
     'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA',
     'Colorado': 'CO', 'Connecticut': 'CT', 'Delaware': 'DE', 'Florida': 'FL', 'Georgia': 'GA',
@@ -402,7 +404,6 @@ state_abbrev = {
     'Virginia': 'VA', 'Washington': 'WA', 'West Virginia': 'WV', 'Wisconsin': 'WI', 'Wyoming': 'WY'
 }
 
-# Define your regions
 northeast_states = {
     "Connecticut", "Maine", "Massachusetts", "New Hampshire", "Rhode Island", "Vermont",
     "New Jersey", "New York", "Pennsylvania"
@@ -436,38 +437,18 @@ def get_region_for_state(state):
     else:
         return 'Other'
 
-def plot_region_map(selected_state_name=None, selected_city_name=None, state_abbrev=state_abbrev):
-    # Regions and colors (keep as before)
-    northeast_states = {
-        "Connecticut", "Maine", "Massachusetts", "New Hampshire", "Rhode Island", "Vermont",
-        "New Jersey", "New York", "Pennsylvania"
-    }
-    midwest_states = {
-        "Illinois", "Indiana", "Iowa", "Kansas", "Michigan", "Minnesota", "Missouri", "Nebraska",
-        "North Dakota", "Ohio", "South Dakota", "Wisconsin"
-    }
-    south_states = {
-        "Alabama", "Arkansas", "Delaware", "Florida", "Georgia", "Kentucky", "Louisiana", "Maryland",
-        "Mississippi", "North Carolina", "Oklahoma", "South Carolina", "Tennessee", "Texas",
-        "Virginia", "West Virginia"
-    }
-    west_states = {
-        "Alaska", "Arizona", "California", "Colorado", "Hawaii", "Idaho", "Montana", "Nevada",
-        "New Mexico", "Oregon", "Utah", "Washington", "Wyoming"
-    }
+def get_city_coords(city, state=None, country="USA"):
+    geolocator = Nominatim(user_agent="house_price_app")
+    location_query = city
+    if state:
+        location_query += f", {state}"
+    location_query += f", {country}"
+    location = geolocator.geocode(location_query)
+    if location:
+        return location.latitude, location.longitude
+    return None, None
 
-    def get_region_for_state(state):
-        if state in northeast_states:
-            return 'Northeast'
-        elif state in midwest_states:
-            return 'Midwest'
-        elif state in south_states:
-            return 'South'
-        elif state in west_states:
-            return 'West'
-        else:
-            return 'Other'
-
+def plot_us_map_with_region_and_selection(selected_state_name=None, selected_city_name=None):
     states_codes = list(state_abbrev.values())
     states_names = list(state_abbrev.keys())
 
@@ -492,7 +473,10 @@ def plot_region_map(selected_state_name=None, selected_city_name=None, state_abb
 
     z = [region_color_map.get(get_region_for_state(st), 4) for st in states_names]
 
-    fig = go.Figure(data=go.Choropleth(
+    fig = go.Figure()
+
+    # Choropleth for regions
+    fig.add_trace(go.Choropleth(
         locations=states_codes,
         z=z,
         locationmode='USA-states',
@@ -501,10 +485,11 @@ def plot_region_map(selected_state_name=None, selected_city_name=None, state_abb
         marker_line_color='white',
         marker_line_width=1,
         zmin=0,
-        zmax=3
+        zmax=3,
+        name="Region"
     ))
 
-    # Highlight selected state
+    # Highlight selected state with orange border and transparent fill
     if selected_state_name in state_abbrev:
         selected_code = state_abbrev[selected_state_name]
         fig.add_trace(go.Choropleth(
@@ -519,25 +504,19 @@ def plot_region_map(selected_state_name=None, selected_city_name=None, state_abb
             name='Selected State'
         ))
 
-    # Add city marker if city selected
+    # Add city marker if city selected and coordinates found
     if selected_city_name and selected_state_name:
-        geolocator = Nominatim(user_agent="house_price_predictor")
-        try:
-            # Try to get city, state, USA for better accuracy
-            location = geolocator.geocode(f"{selected_city_name}, {selected_state_name}, USA")
-            if location:
-                fig.add_trace(go.Scattergeo(
-                    lon=[location.longitude],
-                    lat=[location.latitude],
-                    mode='markers+text',
-                    marker=dict(size=10, color='red', symbol='star'),
-                    text=[selected_city_name],
-                    textposition="top center",
-                    name='Selected City'
-                ))
-        except Exception as e:
-            # If geocoding fails, silently ignore or optionally show a message
-            pass
+        lat, lon = get_city_coords(selected_city_name, selected_state_name)
+        if lat and lon:
+            fig.add_trace(go.Scattergeo(
+                lon=[lon],
+                lat=[lat],
+                mode='markers+text',
+                marker=dict(size=12, color='red', symbol='star'),
+                text=[selected_city_name],
+                textposition="top center",
+                name='Selected City'
+            ))
 
     fig.update_geos(
         visible=False,
@@ -592,9 +571,11 @@ def plot_region_map(selected_state_name=None, selected_city_name=None, state_abb
         title_x=0,
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
+        legend=dict(y=0.5),
     )
 
     return fig
+
 
 if section == "House Price Predictor":
     st.header("5. Predict House Price")
