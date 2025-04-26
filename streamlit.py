@@ -436,22 +436,8 @@ def get_region_for_state(state):
     else:
         return 'Other'
 
-def plot_region_map(selected_state_name):
-    # State abbreviation dictionary
-    state_abbrev = {
-        'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA',
-        'Colorado': 'CO', 'Connecticut': 'CT', 'Delaware': 'DE', 'Florida': 'FL', 'Georgia': 'GA',
-        'Hawaii': 'HI', 'Idaho': 'ID', 'Illinois': 'IL', 'Indiana': 'IN', 'Iowa': 'IA',
-        'Kansas': 'KS', 'Kentucky': 'KY', 'Louisiana': 'LA', 'Maine': 'ME', 'Maryland': 'MD',
-        'Massachusetts': 'MA', 'Michigan': 'MI', 'Minnesota': 'MN', 'Mississippi': 'MS', 'Missouri': 'MO',
-        'Montana': 'MT', 'Nebraska': 'NE', 'Nevada': 'NV', 'New Hampshire': 'NH', 'New Jersey': 'NJ',
-        'New Mexico': 'NM', 'New York': 'NY', 'North Carolina': 'NC', 'North Dakota': 'ND', 'Ohio': 'OH',
-        'Oklahoma': 'OK', 'Oregon': 'OR', 'Pennsylvania': 'PA', 'Rhode Island': 'RI', 'South Carolina': 'SC',
-        'South Dakota': 'SD', 'Tennessee': 'TN', 'Texas': 'TX', 'Utah': 'UT', 'Vermont': 'VT',
-        'Virginia': 'VA', 'Washington': 'WA', 'West Virginia': 'WV', 'Wisconsin': 'WI', 'Wyoming': 'WY'
-    }
-
-    # Define sets of states for regions
+def plot_region_map(selected_state_name=None, selected_city_name=None, state_abbrev=state_abbrev):
+    # Regions and colors (keep as before)
     northeast_states = {
         "Connecticut", "Maine", "Massachusetts", "New Hampshire", "Rhode Island", "Vermont",
         "New Jersey", "New York", "Pennsylvania"
@@ -485,7 +471,6 @@ def plot_region_map(selected_state_name):
     states_codes = list(state_abbrev.values())
     states_names = list(state_abbrev.keys())
 
-    # Reordered region_color_map to match West, Midwest, South, Northeast
     region_color_map = {
         'West': 0,
         'Midwest': 1,
@@ -494,7 +479,6 @@ def plot_region_map(selected_state_name):
         'Other': 4
     }
 
-    # Reordered colorscale accordingly
     colorscale = [
         [0.0, '#ab63fa'],   # West - purple
         [0.25, '#ab63fa'],
@@ -520,11 +504,12 @@ def plot_region_map(selected_state_name):
         zmax=3
     ))
 
+    # Highlight selected state
     if selected_state_name in state_abbrev:
         selected_code = state_abbrev[selected_state_name]
         fig.add_trace(go.Choropleth(
             locations=[selected_code],
-            z=[1],  # dummy value
+            z=[1],  # dummy
             locationmode='USA-states',
             colorscale=[[0, 'rgba(0,0,0,0)'], [1, 'rgba(0,0,0,0)']],  # transparent fill
             showscale=False,
@@ -534,33 +519,52 @@ def plot_region_map(selected_state_name):
             name='Selected State'
         ))
 
+    # Add city marker if city selected
+    if selected_city_name and selected_state_name:
+        geolocator = Nominatim(user_agent="house_price_predictor")
+        try:
+            # Try to get city, state, USA for better accuracy
+            location = geolocator.geocode(f"{selected_city_name}, {selected_state_name}, USA")
+            if location:
+                fig.add_trace(go.Scattergeo(
+                    lon=[location.longitude],
+                    lat=[location.latitude],
+                    mode='markers+text',
+                    marker=dict(size=10, color='red', symbol='star'),
+                    text=[selected_city_name],
+                    textposition="top center",
+                    name='Selected City'
+                ))
+        except Exception as e:
+            # If geocoding fails, silently ignore or optionally show a message
+            pass
+
     fig.update_geos(
-        visible=False,   # hides axis lines & ticks
+        visible=False,
         showcountries=True,
         showlakes=True,
         lakecolor='rgb(255, 255, 255)',
         projection_type='albers usa',
     )
 
-    # Legend order updated
+    # Legend
     region_names = ['West', 'Midwest', 'South', 'Northeast']
     region_colors = ['#ab63fa', '#EF553B', '#00cc96', '#636efa']
 
     legend_annotations = []
     x_start = 0.1
     x_gap = 0.2
-    y_pos = -0.15  # Position below the map
+    y_pos = -0.15
 
     for i, (name, color) in enumerate(zip(region_names, region_colors)):
         x = x_start + i * x_gap
-        # Colored box (square)
         legend_annotations.append(dict(
             x=x,
             y=y_pos,
             xref='paper',
             yref='paper',
             showarrow=False,
-            text="&nbsp;&nbsp;&nbsp;&nbsp;",  # space for colored box
+            text="&nbsp;&nbsp;&nbsp;&nbsp;",
             bgcolor=color,
             bordercolor='black',
             borderwidth=1,
@@ -569,7 +573,6 @@ def plot_region_map(selected_state_name):
             align='center',
             valign='middle'
         ))
-        # Text label next to the box, now white
         legend_annotations.append(dict(
             x=x + 0.05,
             y=y_pos,
@@ -577,7 +580,7 @@ def plot_region_map(selected_state_name):
             yref='paper',
             showarrow=False,
             text=name,
-            font=dict(size=14, color='white'),  # <-- white text color here
+            font=dict(size=14, color='white'),
             align='left',
             valign='middle'
         ))
@@ -585,10 +588,10 @@ def plot_region_map(selected_state_name):
     fig.update_layout(
         margin=dict(r=10, t=40, l=10, b=80),
         annotations=legend_annotations,
-        title_text='US Map Colored by Region with Selected State Highlight',
-        title_x=0,  # Left align the title
-        plot_bgcolor='rgba(0,0,0,0)',  # transparent background (optional)
-        paper_bgcolor='rgba(0,0,0,0)', # transparent paper background (optional)
+        title_text='US Map Colored by Region with Selected State & City',
+        title_x=0,
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)',
     )
 
     return fig
