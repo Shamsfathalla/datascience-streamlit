@@ -389,9 +389,6 @@ elif section == "Urban/Suburban/Rural Prices":
     - Prices increase from rural to suburban to urban due to density, land availability, and amenities.
     """)
 
-import plotly.graph_objects as go
-from geopy.geocoders import Nominatim
-
 state_abbrev = {
     'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA',
     'Colorado': 'CO', 'Connecticut': 'CT', 'Delaware': 'DE', 'Florida': 'FL', 'Georgia': 'GA',
@@ -582,7 +579,6 @@ if section == "House Price Predictor":
     st.header("5. Predict House Price")
     st.write("Enter the details below to predict the house price based on property size, bedrooms, bathrooms, region, city type, area type, and city.")
 
-    # Use lowercase keys for mapping to ensure consistent lookup
     city_type_map = {
         "town": 0, "small city": 1, "medium city": 2, "large city": 3, "metropolis": 4
     }
@@ -600,41 +596,25 @@ if section == "House Price Predictor":
     states = sorted(region_state_hierarchy[selected_region].keys()) if selected_region != "Select Region" else []
     selected_state = st.selectbox("Select State", ["Select State"] + states, index=0)
 
-    # Always show map (no else)
-    fig = plot_region_map(selected_state if selected_state != "Select State" else None)
-    st.plotly_chart(fig, use_container_width=True)
-
-    # Helper to capitalize options for display
+    # City Type dropdown with capitalized display options
     def capitalize_options(options):
         return [opt.title() for opt in options]
 
-    # City Type dropdown with capitalized display options
     city_types_raw = sorted(region_state_hierarchy[selected_region][selected_state].keys()) \
         if selected_region != "Select Region" and selected_state != "Select State" else []
     city_types_display = capitalize_options(city_types_raw)
     city_type_choice = st.selectbox("Select City Type", ["Select City Type"] + city_types_display, index=0)
 
-    # Map back selected display value to lowercase key
-    if city_type_choice != "Select City Type":
-        selected_city_type_label = city_type_choice.lower()
-    else:
-        selected_city_type_label = "Select City Type"
+    selected_city_type_label = city_type_choice.lower() if city_type_choice != "Select City Type" else "Select City Type"
 
-    # Area Type dropdown with capitalized display options
+    # Area Type dropdown
     area_types_raw = sorted(
         region_state_hierarchy[selected_region][selected_state].get(selected_city_type_label, {}).keys()
     ) if (selected_region != "Select Region" and selected_state != "Select State" and selected_city_type_label != "Select City Type") else []
     area_types_display = capitalize_options(area_types_raw)
     area_type_choice = st.selectbox("Select Area Type", ["Select Area Type"] + area_types_display, index=0)
 
-    if area_type_choice != "Select Area Type":
-        selected_area_type_label = area_type_choice.lower()
-    else:
-        selected_area_type_label = "Select Area Type"
-
-    # Convert selections to numeric codes for model
-    selected_city_type = city_type_map.get(selected_city_type_label, 0)
-    selected_area_type = area_type_map.get(selected_area_type_label, 0)
+    selected_area_type_label = area_type_choice.lower() if area_type_choice != "Select Area Type" else "Select Area Type"
 
     # City dropdown
     cities = []
@@ -649,6 +629,13 @@ if section == "House Price Predictor":
             st.error(f"Error loading cities: {e}")
     cities = sorted(cities) if cities else ["No cities available"]
     selected_city = st.selectbox("Select City", ["Select City"] + cities, index=0)
+
+    # Show combined map here
+    state_for_map = selected_state if selected_state != "Select State" else None
+    city_for_map = selected_city if selected_city not in ["Select City", "No cities available"] else None
+
+    fig = plot_us_map_with_region_and_selection(state_for_map, city_for_map)
+    st.plotly_chart(fig, use_container_width=True)
 
     # Input property info
     st.subheader("Input House Details")
@@ -666,8 +653,8 @@ if section == "House Price Predictor":
             'bed': bed,
             'bath': bath,
             'bed_bath_ratio': bed_bath_ratio,
-            'city_type': selected_city_type,
-            'area_type': selected_area_type,
+            'city_type': city_type_map.get(selected_city_type_label, 0),
+            'area_type': area_type_map.get(selected_area_type_label, 0),
             'region_Midwest': 1 if selected_region == 'Midwest' else 0,
             'region_Northeast': 1 if selected_region == 'Northeast' else 0,
             'region_South': 1 if selected_region == 'South' else 0,
