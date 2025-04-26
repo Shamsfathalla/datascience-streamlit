@@ -137,6 +137,30 @@ power_transformers, scalers = initialize_transformers(df)
 # Define model features
 model_features = [col for col in df.columns if col not in ['price', 'area_type_label', 'city_type_label']]
 
+# Custom CSS for buttons
+st.markdown("""
+    <style>
+    .graph-button {
+        background-color: rgb(38, 39, 48);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 8px 16px;
+        margin: 0 5px 5px 0;
+        cursor: pointer;
+        font-size: 14px;
+        display: inline-block;
+        text-align: center;
+    }
+    .graph-button:hover {
+        background-color: rgb(50, 51, 60);
+    }
+    .stButton > button {
+        width: auto;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
 # Title
 st.title("U.S. Housing Market Analysis")
 
@@ -170,15 +194,27 @@ if section == "Home":
 elif section == "Regional Price Differences":
     st.header("1. How do property prices differ between the different U.S. regions?")
     
-    # Define the graphs for this section
+    # Define the graphs for this section with simplified titles
     graphs = {
-        "Average Property Price by Region": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Property%20Price%20by%20Region.png",
-        "Average Population in 2024 by Region": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Population%20in%202024%20by%20Region.png",
-        "Average Density by Region": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Density%20by%20Region.png"
+        "Property Price by Region": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Property%20Price%20by%20Region.png",
+        "Population by Region": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Population%20in%202024%20by%20Region.png",
+        "Density by Region": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Density%20by%20Region.png"
     }
     
-    # Create navigation tabs for graphs
-    selected_graph = st.radio("Select a graph to view:", list(graphs.keys()), horizontal=True)
+    # Create centered container for buttons
+    st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
+    cols = st.columns(len(graphs))
+    selected_graph = list(graphs.keys())[0]  # Default to first graph
+    for i, (graph_title, graph_url) in enumerate(graphs.items()):
+        with cols[i]:
+            if st.button(graph_title, key=graph_title, help=graph_title):
+                selected_graph = graph_title
+            st.markdown(f"""
+                <script>
+                document.querySelector('button[title="{graph_title}"]').classList.add('graph-button');
+                </script>
+            """, unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
     
     # Display the selected graph
     st.subheader(selected_graph)
@@ -208,15 +244,27 @@ elif section == "Regional Price Differences":
 elif section == "Bedrooms/Bathrooms Impact":
     st.header("2. How does the number of bedrooms and bathrooms affect home prices?")
     
-    # Define the graphs for this section
+    # Define the graphs for this section with simplified titles
     graphs = {
         "Bedrooms vs Price": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Bedrooms%20vs%20Price.png",
         "Bathrooms vs Price": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Bathrooms%20vs%20Price.png",
         "Bed/Bath Ratio vs Price": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Bed&Bath%20Ratio%20vs%20Price.png"
     }
     
-    # Create navigation tabs for graphs
-    selected_graph = st.radio("Select a graph to view:", list(graphs.keys()), horizontal=True)
+    # Create centered container for buttons
+    st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
+    cols = st.columns(len(graphs))
+    selected_graph = list(graphs.keys())[0]  # Default to first graph
+    for i, (graph_title, graph_url) in enumerate(graphs.items()):
+        with cols[i]:
+            if st.button(graph_title, key=graph_title, help=graph_title):
+                selected_graph = graph_title
+            st.markdown(f"""
+                <script>
+                document.querySelector('button[title="{graph_title}"]').classList.add('graph-button');
+                </script>
+            """, unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
     
     # Display the selected graph
     st.subheader(selected_graph)
@@ -237,15 +285,27 @@ elif section == "Bedrooms/Bathrooms Impact":
 elif section == "House Size by City Type ":
     st.header("3. What is the average house size per city types in the U.S.?")
     
-    # Define the graphs for this section
+    # Define the graphs for this section with simplified titles
     graphs = {
-        "Average House Size by City Type": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20House%20Size%20by%20City%20Type.png",
-        "Average Property Size by City Type": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Property%20Size%20by%20City%20Type.png",
-        "Average Acre Lot by City Type": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Acre%20Lot%20by%20City%20Type.png"
+        "House Size by City": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20House%20Size%20by%20City%20Type.png",
+        "Property Size by City": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Property%20Size%20by%20City%20Type.png",
+        "Acre Lot by City": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Acre%20Lot%20by%20City%20Type.png"
     }
     
-    # Create navigation tabs for graphs
-    selected_graph = st.radio("Select a graph to view:", list(graphs.keys()), horizontal=True)
+    # Create centered container for buttons
+    st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
+    cols = st.columns(len(graphs))
+    selected_graph = list(graphs.keys())[0]  # Default to first graph
+    for i, (graph_title, graph_url) in enumerate(graphs.items()):
+        with cols[i]:
+            if st.button(graph_title, key=graph_title, help=graph_title):
+                selected_graph = graph_title
+            st.markdown(f"""
+                <script>
+                document.querySelector('button[title="{graph_title}"]').classList.add('graph-button');
+                </script>
+            """, unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
     
     # Display the selected graph
     st.subheader(selected_graph)
@@ -273,16 +333,28 @@ elif section == "House Size by City Type ":
 elif section == "Urban/Suburban/Rural Prices":
     st.header("4. How do prices fluctuate between urban, suburban and rural cities?")
     
-    # Define the graphs for this section
+    # Define the graphs for this section with simplified titles
     graphs = {
-        "Average Property Price by Area Type": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Property%20Price%20by%20Area%20Type.png",
-        "Average Property Size by Area Type": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Property%20Size%20by%20Area%20Type.png",
-        "Average Population (2024) by Area Type": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Population%20(2024)%20by%20Area%20Type.png",
-        "Average Population Density by Area Type": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Population%20Density%20by%20Area%20Type.png"
+        "Price by Area Type": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Property%20Price%20by%20Area%20Type.png",
+        "Property Size by Area": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Property%20Size%20by%20Area%20Type.png",
+        "Population by Area": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Population%20(2024)%20by%20Area%20Type.png",
+        "Density by Area": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Population%20Density%20by%20Area%20Type.png"
     }
     
-    # Create navigation tabs for graphs
-    selected_graph = st.radio("Select a graph to view:", list(graphs.keys()), horizontal=True)
+    # Create centered container for buttons
+    st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
+    cols = st.columns(len(graphs))
+    selected_graph = list(graphs.keys())[0]  # Default to first graph
+    for i, (graph_title, graph_url) in enumerate(graphs.items()):
+        with cols[i]:
+            if st.button(graph_title, key=graph_title, help=graph_title):
+                selected_graph = graph_title
+            st.markdown(f"""
+                <script>
+                document.querySelector('button[title="{graph_title}"]').classList.add('graph-button');
+                </script>
+            """, unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
     
     # Display the selected graph
     st.subheader(selected_graph)
