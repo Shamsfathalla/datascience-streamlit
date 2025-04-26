@@ -392,7 +392,7 @@ elif section == "House Price Predictor":
     st.header("5. Predict House Price")
     st.write("Enter the details below to predict the house price based on property size, bedrooms, bathrooms, region, city type, area type, and city.")
     
-    # Map numerical codes to labels (use capitalized keys)
+    # Map numerical codes to labels
     city_type_map = {
         "Town": 0, "Small City": 1, "Medium City": 2, "Large City": 3, "Metropolis": 4
     }
@@ -419,10 +419,9 @@ elif section == "House Price Predictor":
         region_state_hierarchy[selected_region][selected_state][selected_city_type_label].keys()
     ) if (selected_region != "Select Region" and selected_state != "Select State" and selected_city_type_label != "Select City Type") else []
     selected_area_type_label = st.selectbox("Select Area Type", ["Select Area Type"] + area_types, index=0)
-    
-    # Map selected labels to numerical codes
+
     selected_city_type = city_type_map.get(selected_city_type_label, 0)
-    selected_area_type = area_type_map.get(selected_area_type_label, 0)
+    selected_area_type = area_type_map.get(selected_area_type_label.lower(), 0)
     
     # City dropdown
     cities = []
@@ -437,7 +436,7 @@ elif section == "House Price Predictor":
             st.error(f"Error loading cities: {e}")
     cities = sorted(cities) if cities else ["No cities available"]
     selected_city = st.selectbox("Select City", ["Select City"] + cities, index=0)
-    
+
     # Input property info
     st.subheader("Input House Details")
     col1, col2 = st.columns(2)
