@@ -388,54 +388,6 @@ elif section == "Urban/Suburban/Rural Prices":
     - Prices increase from rural to suburban to urban due to density, land availability, and amenities.
     """)
 
-# State name to abbreviation mapping
-state_abbrev = {
-    'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA',
-    'Colorado': 'CO', 'Connecticut': 'CT', 'Delaware': 'DE', 'Florida': 'FL', 'Georgia': 'GA',
-    'Hawaii': 'HI', 'Idaho': 'ID', 'Illinois': 'IL', 'Indiana': 'IN', 'Iowa': 'IA',
-    'Kansas': 'KS', 'Kentucky': 'KY', 'Louisiana': 'LA', 'Maine': 'ME', 'Maryland': 'MD',
-    'Massachusetts': 'MA', 'Michigan': 'MI', 'Minnesota': 'MN', 'Mississippi': 'MS', 'Missouri': 'MO',
-    'Montana': 'MT', 'Nebraska': 'NE', 'Nevada': 'NV', 'New Hampshire': 'NH', 'New Jersey': 'NJ',
-    'New Mexico': 'NM', 'New York': 'NY', 'North Carolina': 'NC', 'North Dakota': 'ND', 'Ohio': 'OH',
-    'Oklahoma': 'OK', 'Oregon': 'OR', 'Pennsylvania': 'PA', 'Rhode Island': 'RI', 'South Carolina': 'SC',
-    'South Dakota': 'SD', 'Tennessee': 'TN', 'Texas': 'TX', 'Utah': 'UT', 'Vermont': 'VT',
-    'Virginia': 'VA', 'Washington': 'WA', 'West Virginia': 'WV', 'Wisconsin': 'WI', 'Wyoming': 'WY'
-}
-
-# Define your regions
-northeast_states = {
-    "Connecticut", "Maine", "Massachusetts", "New Hampshire", "Rhode Island", "Vermont",
-    "New Jersey", "New York", "Pennsylvania"
-}
-
-midwest_states = {
-    "Illinois", "Indiana", "Iowa", "Kansas", "Michigan", "Minnesota", "Missouri", "Nebraska",
-    "North Dakota", "Ohio", "South Dakota", "Wisconsin"
-}
-
-south_states = {
-    "Alabama", "Arkansas", "Delaware", "Florida", "Georgia", "Kentucky", "Louisiana", "Maryland",
-    "Mississippi", "North Carolina", "Oklahoma", "South Carolina", "Tennessee", "Texas",
-    "Virginia", "West Virginia"
-}
-
-west_states = {
-    "Alaska", "Arizona", "California", "Colorado", "Hawaii", "Idaho", "Montana", "Nevada",
-    "New Mexico", "Oregon", "Utah", "Washington", "Wyoming"
-}
-
-def get_region_for_state(state):
-    if state in northeast_states:
-        return 'Northeast'
-    elif state in midwest_states:
-        return 'Midwest'
-    elif state in south_states:
-        return 'South'
-    elif state in west_states:
-        return 'West'
-    else:
-        return 'Other'
-
 def plot_region_map(selected_state_name):
     # Get all states and their codes
     states_codes = list(state_abbrev.values())
@@ -495,23 +447,24 @@ def plot_region_map(selected_state_name):
             name='Selected State'
         ))
 
-    # Add custom legend (colored dots + text) on the right
-    legend_x = 1.02  # just outside map right boundary
-    legend_y_start = 0.9
-    legend_y_step = 0.1
+    # Add legend for regions on the right side
     region_names = ['Northeast', 'Midwest', 'South', 'West']
     region_colors = ['#636efa', '#EF553B', '#00cc96', '#ab63fa']
 
-    for i, (region, color) in enumerate(zip(region_names, region_colors)):
+    legend_y_start = 0.95
+    legend_y_step = 0.07
+    legend_x = 1.02  # Slightly right of map
+
+    for i, (name, color) in enumerate(zip(region_names, region_colors)):
         fig.add_trace(go.Scatter(
             x=[legend_x],
             y=[legend_y_start - i * legend_y_step],
             mode='markers+text',
-            marker=dict(size=20, color=color),
-            text=[region],
+            marker=dict(color=color, size=15),
+            text=[name],
             textposition='middle right',
             showlegend=False,
-            hoverinfo='none'
+            hoverinfo='none',
         ))
 
     fig.update_layout(
@@ -522,119 +475,6 @@ def plot_region_map(selected_state_name):
             showlakes=True,
             lakecolor='rgb(255, 255, 255)'
         ),
-        margin={"r":150,"t":40,"l":0,"b":0}  # add right margin for legend
+        margin={"r":120, "t":40, "l":0, "b":0}  # Add right margin for legend space
     )
     return fig
-
-
-# --- Your main Streamlit code here ---
-if section == "House Price Predictor":
-    st.header("5. Predict House Price")
-    st.write("Enter the details below to predict the house price based on property size, bedrooms, bathrooms, region, city type, area type, and city.")
-
-    # Map numerical codes to labels
-    city_type_map = {
-        "Town": 0, "Small City": 1, "Medium City": 2, "Large City": 3, "Metropolis": 4
-    }
-    area_type_map = {
-        "Rural": 0, "Suburban": 1, "Urban": 2
-    }
-
-    st.subheader("Select Geographic Attributes")
-
-    # Region dropdown
-    regions = sorted(region_state_hierarchy.keys())
-    selected_region = st.selectbox("Select Region", ["Select Region"] + regions, index=0)
-
-    # State dropdown
-    states = sorted(region_state_hierarchy[selected_region].keys()) if selected_region != "Select Region" else []
-    selected_state = st.selectbox("Select State", ["Select State"] + states, index=0)
-
-    # Always show map (no else)
-    fig = plot_region_map(selected_state if selected_state != "Select State" else None)
-    st.plotly_chart(fig, use_container_width=True)
-
-    # City Type dropdown
-    city_types = sorted(region_state_hierarchy[selected_region][selected_state].keys()) \
-        if selected_region != "Select Region" and selected_state != "Select State" else []
-    selected_city_type_label = st.selectbox("Select City Type", ["Select City Type"] + city_types, index=0)
-
-    # Area Type dropdown
-    area_types = sorted(
-        region_state_hierarchy[selected_region][selected_state][selected_city_type_label].keys()
-    ) if (selected_region != "Select Region" and selected_state != "Select State" and selected_city_type_label != "Select City Type") else []
-    selected_area_type_label = st.selectbox("Select Area Type", ["Select Area Type"] + area_types, index=0)
-
-    selected_city_type = city_type_map.get(selected_city_type_label, 0)
-    selected_area_type = area_type_map.get(selected_area_type_label.lower(), 0)
-
-    # City dropdown
-    cities = []
-    if (selected_region != "Select Region" and selected_state != "Select State" and 
-        selected_city_type_label != "Select City Type" and selected_area_type_label != "Select Area Type"):
-        try:
-            cities = region_state_hierarchy[selected_region][selected_state][selected_city_type_label][selected_area_type_label]
-            if not isinstance(cities, list):
-                st.error("City list is not valid.")
-                cities = []
-        except (KeyError, TypeError) as e:
-            st.error(f"Error loading cities: {e}")
-    cities = sorted(cities) if cities else ["No cities available"]
-    selected_city = st.selectbox("Select City", ["Select City"] + cities, index=0)
-
-    # Input property info
-    st.subheader("Input House Details")
-    col1, col2 = st.columns(2)
-    with col1:
-        property_size = st.number_input("Property Size (sq ft)", min_value=100.0, max_value=100000.0, value=100.0, step=100.0)
-        bed = st.number_input("Number of Bedrooms", min_value=1, max_value=20, value=1, step=1)
-    with col2:
-        bath = st.number_input("Number of Bathrooms", min_value=1, max_value=20, value=1, step=1)
-
-    if st.button("Predict House Price"):
-        bed_bath_ratio = bed / bath if bath != 0 else 1.0
-        input_data = {
-            'property_size': property_size,
-            'bed': bed,
-            'bath': bath,
-            'bed_bath_ratio': bed_bath_ratio,
-            'city_type': selected_city_type,
-            'area_type': selected_area_type,
-            'region_Midwest': 1 if selected_region == 'Midwest' else 0,
-            'region_Northeast': 1 if selected_region == 'Northeast' else 0,
-            'region_South': 1 if selected_region == 'South' else 0,
-            'region_West': 1 if selected_region == 'West' else 0,
-        }
-        input_df = pd.DataFrame([input_data])
-
-        # Transform numerical features
-        for col in ['property_size', 'bed_bath_ratio']:
-            if col in input_df.columns and col in power_transformers:
-                input_df[col] = np.log1p(input_df[col])
-                input_df[col] = power_transformers[col].transform(input_df[[col]])
-                input_df[col] = scalers[col].transform(input_df[[col]])
-
-        # Add missing features with defaults
-        model_features = ['bed', 'bath', 'acre_lot', 'house_size', 'population_2024', 'density',
-                          'city_type', 'area_type', 'property_size', 'bed_bath_ratio',
-                          'region_Midwest', 'region_Northeast', 'region_South', 'region_West']
-        for feature in model_features:
-            if feature not in input_df.columns:
-                if feature in df.columns:
-                    median_value = df[feature].median()
-                    if feature in power_transformers:
-                        val = np.log1p(median_value)
-                        val = power_transformers[feature].transform(np.array(val).reshape(1, -1))
-                        val = scalers[feature].transform(val)
-                        input_df[feature] = val[0, 0]
-                    else:
-                        input_df[feature] = median_value
-                else:
-                    input_df[feature] = 0
-
-        input_df = input_df[model_features]
-
-        # Predict house price
-        price_pred = model.predict(input_df)
-        predicted_price = np.expm1(price_pred[0])  # reverse log1p transform
-        st.success(f"Predicted House Price: ${predicted_price:,.2f}")
