@@ -647,12 +647,11 @@ if section == "House Price Predictor":
     selected_city = st.selectbox("Select City", ["Select City"] + cities, index=0)
 
     # Show map after city selection with the selected city point
-    if selected_state != "Select State" and selected_city != "Select City":
-        fig = plot_region_map(
-            selected_state if selected_state != "Select State" else None,
-            selected_city if selected_city != "Select City" else None
-        )
-        st.plotly_chart(fig, use_container_width=True)
+    fig = plot_region_map(
+        selected_state if selected_state != "Select State" else None,
+        selected_city if selected_city != "Select City" else None
+    )
+    st.plotly_chart(fig, use_container_width=True)
 
     # Input property info
     st.subheader("Input House Details")
