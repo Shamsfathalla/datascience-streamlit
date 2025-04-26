@@ -668,43 +668,60 @@ if section == "House Price Predictor":
     cities = sorted(cities) if cities else ["No cities available"]
     selected_city = st.selectbox("Select City", ["Select City"] + cities, index=0)
 
-    ### --- New: Get city coordinates and plot city map --- ###
     from geopy.geocoders import Nominatim
     import plotly.express as px
 
-    def get_city_coords(city, state=None, country="USA"):
-        geolocator = Nominatim(user_agent="house_price_app")
-        location_query = city
-        if state:
-            location_query += f", {state}"
-        location_query += f", {country}"
-        location = geolocator.geocode(location_query)
-        if location:
-            return location.latitude, location.longitude
-        return None, None
+   def get_city_coords(city, state=None, country="USA"):
+    geolocator = Nominatim(user_agent="house_price_app")
+    location_query = city
+    if state:
+        location_query += f", {state}"
+    location_query += f", {country}"
+    location = geolocator.geocode(location_query)
+    if location:
+        return location.latitude, location.longitude
+    return None, None
 
-    def plot_city_map(city, lat, lon):
-        fig = px.scatter_mapbox(
-            lat=[lat],
-            lon=[lon],
-            zoom=10,
-            height=400,
-            mapbox_style="open-street-map",
-            hover_name=[city],
-            title=f"Location of {city}"
-        )
-        return fig
+def plot_us_map_with_pin(lat, lon, city):
+    # Center on US roughly (lat=39, lon=-98), zoomed out
+    fig = px.scatter_mapbox(
+        lat=[lat],
+        lon=[lon],
+        zoom=3,
+        height=400,
+        mapbox_style="open-street-map",
+        hover_name=[city],
+        title=f"US Map with {city} Location"
+    )
+    return fig
 
-    if selected_city not in ["Select City", "No cities available"]:
-        lat, lon = get_city_coords(selected_city, selected_state)
-        if lat and lon:
-            city_fig = plot_city_map(selected_city, lat, lon)
-            st.subheader(f"Map for {selected_city}")
-            st.plotly_chart(city_fig, use_container_width=True)
-        else:
-            st.error("Sorry, could not find coordinates for the selected city.")
+def plot_city_map(city, lat, lon):
+    fig = px.scatter_mapbox(
+        lat=[lat],
+        lon=[lon],
+        zoom=10,
+        height=400,
+        mapbox_style="open-street-map",
+        hover_name=[city],
+        title=f"Zoomed-in Map of {city}"
+    )
+    return fig
 
-    ### --- End new code --- ###
+
+if selected_city not in ["Select City", "No cities available"]:
+    lat, lon = get_city_coords(selected_city, selected_state)
+    if lat and lon:
+        # Plot US map with city pin
+        us_map_fig = plot_us_map_with_pin(lat, lon, selected_city)
+        st.subheader("US Map with City Location")
+        st.plotly_chart(us_map_fig, use_container_width=True)
+
+        # Plot zoomed-in city map below
+        city_map_fig = plot_city_map(selected_city, lat, lon)
+        st.subheader(f"Zoomed-in Map of {selected_city}")
+        st.plotly_chart(city_map_fig, use_container_width=True)
+    else:
+        st.error("Sorry, could not find coordinates for the selected city.")
 
     # Input property info
     st.subheader("Input House Details")
