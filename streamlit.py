@@ -8,6 +8,9 @@ import joblib
 import json
 from sklearn.preprocessing import MinMaxScaler, PowerTransformer
 import plotly.graph_objects as go
+from geopy.geocoders import Nominatim
+import plotly.express as px
+
 
 # Set page config (must be first Streamlit command)
 st.set_page_config(page_title="U.S. Housing Market Analysis", layout="wide")
@@ -593,9 +596,6 @@ def plot_region_map(selected_state_name):
 
     return fig
 
-from geopy.geocoders import Nominatim
-import plotly.express as px
-
 if section == "House Price Predictor":
     st.header("5. Predict House Price")
     st.write("Enter the details below to predict the house price based on property size, bedrooms, bathrooms, region, city type, area type, and city.")
@@ -668,10 +668,7 @@ if section == "House Price Predictor":
     cities = sorted(cities) if cities else ["No cities available"]
     selected_city = st.selectbox("Select City", ["Select City"] + cities, index=0)
 
-    from geopy.geocoders import Nominatim
-    import plotly.express as px
-
-   def get_city_coords(city, state=None, country="USA"):
+def get_city_coords(city, state=None, country="USA"):
     geolocator = Nominatim(user_agent="house_price_app")
     location_query = city
     if state:
