@@ -146,7 +146,7 @@ section = st.sidebar.radio("Go to",
                          ["Home", 
                           "Regional Price Differences", 
                           "Bedrooms/Bathrooms Impact", 
-                          "House Size by City Type", 
+                          "House Size by City Type " , 
                           "Urban/Suburban/Rural Prices",
                           "House Price Predictor"])
 
@@ -164,7 +164,7 @@ if section == "Home":
     - **House Price Predictor**: Predict house price based on property features and geographical data
     """)
     st.image("https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80", 
-             caption="U.S. Housing Market Analysis", use_container_width=True)
+             use_container_width=True)
 
 # Regional Price Differences section
 elif section == "Regional Price Differences":
@@ -172,15 +172,15 @@ elif section == "Regional Price Differences":
     # Display pre-existing images
     st.subheader("Average Property Price by Region")
     st.image("https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Property%20Price%20by%20Region.png",
-             caption="Average Property Price by Region", use_container_width=True)
+             use_container_width=True)
     
     st.subheader("Average Population in 2024 by Region")
     st.image("https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Population%20in%202024%20by%20Region.png",
-             caption="Average Population in 2024 by Region", use_container_width=True)
+             use_container_width=True)
     
     st.subheader("Average Density by Region")
     st.image("https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Density%20by%20Region.png",
-             caption="Average Density by Region", use_container_width=True)
+             use_container_width=True)
     
     st.write("""
     ### Key Insights:
@@ -213,15 +213,15 @@ elif section == "Bedrooms/Bathrooms Impact":
     # Display pre-existing images
     st.subheader("Bedrooms vs Price")
     st.image("https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Bedrooms%20vs%20Price.png",
-             caption="Bedrooms vs Price", use_container_width=True)
+             use_container_width=True)
     
     st.subheader("Bathrooms vs Price")
     st.image("https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Bathrooms%20vs%20Price.png",
-             caption="Bathrooms vs Price", use_container_width=True)
+             use_container_width=True)
     
     st.subheader("Bed/Bath Ratio vs Price")
-    st.image("https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Bed%20Bath%20Ratio%20vs%20Price.png",
-             caption="Bed/Bath Ratio vs Price", use_container_width=True)
+    st.image("https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Bed%20&%20Bath%20Ratio%20vs%20Price.png",
+             use_container_width=True)
     
     st.write("""
     ### Key Insights:
@@ -234,7 +234,7 @@ elif section == "Bedrooms/Bathrooms Impact":
     """)
 
 # House Size by City Type section
-elif section == "House Size by City Type":
+elif section == "House Size by City Type ":
     st.header("3. What is the average house size per city types in the U.S.?")
     # Map area_type and city_type labels
     area_type_map = {0: 'Rural', 1: 'Suburban', 2: 'Urban'}
@@ -251,15 +251,15 @@ elif section == "House Size by City Type":
     # Display pre-existing images
     st.subheader("Average House Size by City Type")
     st.image("https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20House%20Size%20by%20City%20Type.png",
-             caption="Average House Size by City Type", use_container_width=True)
+             use_container_width=True)
     
     st.subheader("Average Property Size by City Type")
     st.image("https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Property%20Size%20by%20City%20Type.png",
-             caption="Average Property Size by City Type", use_container_width=True)
+             use_container_width=True)
     
     st.subheader("Average Acre Lot by City Type")
     st.image("https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Acre%20Lot%20by%20City%20Type.png",
-             caption="Average Acre Lot by City Type", use_container_width=True)
+             use_container_width=True)
     
     st.write("""
     ### Key Insights:
@@ -297,19 +297,19 @@ elif section == "Urban/Suburban/Rural Prices":
     # Display pre-existing images
     st.subheader("Average Property Price by Area Type")
     st.image("https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Property%20Price%20by%20Area%20Type.png",
-             caption="Average Property Price by Area Type", use_container_width=True)
+             use_container_width=True)
     
     st.subheader("Average Property Size by Area Type")
     st.image("https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Property%20Size%20by%20Area%20Type.png",
-             caption="Average Property Size by Area Type", use_container_width=True)
+             use_container_width=True)
     
     st.subheader("Average Population (2024) by Area Type")
     st.image("https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Population%20(2024)%20by%20Area%20Type.png",
-             caption="Average Population (2024) by Area Type", use_container_width=True)
+             use_container_width=True)
     
     st.subheader("Average Population Density by Area Type")
     st.image("https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Population%20Density%20by%20Area%20Type.png",
-             caption="Average Population Density by Area Type", use_container_width=True)
+             use_container_width=True)
     
     st.write("""
     ### Key Insights:
