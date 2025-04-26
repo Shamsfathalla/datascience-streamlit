@@ -495,6 +495,26 @@ def plot_region_map(selected_state_name):
             name='Selected State'
         ))
 
+    # Add legend markers and labels for regions
+    region_names = ['Northeast', 'Midwest', 'South', 'West']
+    region_colors = ['#636efa', '#EF553B', '#00cc96', '#ab63fa']
+
+    legend_x = 1.02  # position to the right of the map (x-axis)
+    legend_y_start = 0.95  # start near top of plot (y-axis)
+    legend_y_step = 0.07   # vertical spacing between legend items
+
+    for i, (name, color) in enumerate(zip(region_names, region_colors)):
+        fig.add_trace(go.Scatter(
+            x=[legend_x],
+            y=[legend_y_start - i * legend_y_step],
+            mode='markers+text',
+            marker=dict(color=color, size=15),
+            text=[name],
+            textposition='middle right',
+            showlegend=False,
+            hoverinfo='none',
+        ))
+
     fig.update_layout(
         title_text='US Map Colored by Region with Selected State Highlight',
         geo=dict(
@@ -503,12 +523,10 @@ def plot_region_map(selected_state_name):
             showlakes=True,
             lakecolor='rgb(255, 255, 255)'
         ),
-        margin={"r":0,"t":40,"l":0,"b":0}
+        margin={"r":80, "t":40, "l":0, "b":0}  # Add right margin for legend space
     )
     return fig
 
-
-# --- Your main Streamlit code here ---
 if section == "House Price Predictor":
     st.header("5. Predict House Price")
     st.write("Enter the details below to predict the house price based on property size, bedrooms, bathrooms, region, city type, area type, and city.")
