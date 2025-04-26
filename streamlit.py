@@ -201,141 +201,191 @@ elif section == "Regional Price Differences":
         "Average Density by Region": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Density%20by%20Region.png"
     }
     
-    import streamlit as st
-
-# Helper layouts
-
-def three_buttons_layout(button_labels, keys_prefix):
-    # 5 columns: spacer, btn1, btn2 (center), btn3, spacer
-    cols = st.columns([1, 2, 2, 2, 1])
-    btns = []
-    btns.append(cols[1].button(button_labels[0], key=f"{keys_prefix}_btn1"))
-    btns.append(cols[2].button(button_labels[1], key=f"{keys_prefix}_btn2"))
-    btns.append(cols[3].button(button_labels[2], key=f"{keys_prefix}_btn3"))
-    return btns
-
-def four_buttons_layout(button_labels, keys_prefix):
-    # 7 columns: spacer, btn1, btn2, btn3, btn4, spacer
-    cols = st.columns([1, 2, 2, 2, 2, 2, 1])
-    btns = []
-    btns.append(cols[1].button(button_labels[0], key=f"{keys_prefix}_btn1"))
-    btns.append(cols[2].button(button_labels[1], key=f"{keys_prefix}_btn2"))
-    btns.append(cols[3].button(button_labels[2], key=f"{keys_prefix}_btn3"))
-    btns.append(cols[4].button(button_labels[3], key=f"{keys_prefix}_btn4"))
-    return btns
-
-# Your main Streamlit app page handling
-
-section = st.sidebar.selectbox(
-    "Select Analysis Section",
-    [
-        "Regional Price Differences",
-        "Bedrooms/Bathrooms Impact",
-        "House Size by City Type",
-        "Urban/Suburban/Rural Prices"
-    ]
-)
-
-if section == "Regional Price Differences":
-    st.header("1. How do property prices differ between the different U.S. regions?")
+    # Create centered container for 3 buttons
+    col1, col2, col3 = st.columns([1,1,1])
+    with col1:
+        btn1 = st.button(list(graphs.keys())[0], key="btn1")
+    with col2:
+        btn2 = st.button(list(graphs.keys())[1], key="btn2")
+    with col3:
+        btn3 = st.button(list(graphs.keys())[2], key="btn3")
     
-    graphs = {
-        "Average Property Price by Region": "https://path_to_image_1.png",
-        "Average Population in 2024 by Region": "https://path_to_image_2.png",
-        "Average Density by Region": "https://path_to_image_3.png"
-    }
-    
-    btns = three_buttons_layout(list(graphs.keys()), "rpd")
-    
-    if btns[0]:
+    # Determine which graph to show
+    if btn1:
         selected_graph = list(graphs.keys())[0]
-    elif btns[1]:
+    elif btn2:
         selected_graph = list(graphs.keys())[1]
-    elif btns[2]:
+    elif btn3:
         selected_graph = list(graphs.keys())[2]
     else:
-        selected_graph = list(graphs.keys())[0]
+        selected_graph = list(graphs.keys())[0]  # Default
     
+    # Display the selected graph
     st.subheader(selected_graph)
     st.image(graphs[selected_graph], use_container_width=True)
     
-    # Add insights or explanations here
-    st.write("Insights and explanation for:", selected_graph)
+    # Insights section
+    st.write("""
+    ### Key Insights:
+    - West Region:
+        - Property Price: The West continues to have the highest average property price at approximately $473,869.94.
+        - Population and Density: Despite a moderate population density, the high property prices in the West suggest that factors beyond density contribute significantly to elevated housing costs.
+    - Northeast Region:
+        - Property Price: The Northeast has a high average property price of around $277,303.81.
+        - Population and Density: The Northeast's high density (5,942.71) reflects its concentration of major cities.
+    - South Region:
+        - Property Price: The South has an average property price of about $296,500.84.
+        - Population and Density: With a lower population density (3,302.13) than the Northeast and West.
+    - Midwest Region:
+        - Property Price: The Midwest has the lowest average property price at approximately $231,103.74.
+        - Population and Density: The Midwest's low population density impacts housing demand.
+    ### Final Answer:
+    - Property Prices: West (Highest) > South > Northeast > Midwest (Lowest).
+    - Driven by population density, urban development, economic activity, and regional demand.
+    """)
 
+# Bedrooms/Bathrooms Impact section
 elif section == "Bedrooms/Bathrooms Impact":
     st.header("2. How does the number of bedrooms and bathrooms affect home prices?")
     
+    # Define the graphs for this section
     graphs = {
-        "Bedrooms vs Price": "https://path_to_image_4.png",
-        "Bathrooms vs Price": "https://path_to_image_5.png",
-        "Bed/Bath Ratio vs Price": "https://path_to_image_6.png"
+        "Bedrooms vs Price": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Bedrooms%20vs%20Price.png",
+        "Bathrooms vs Price": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Bathrooms%20vs%20Price.png",
+        "Bed/Bath Ratio vs Price": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Bed&Bath%20Ratio%20vs%20Price.png"
     }
     
-    btns = three_buttons_layout(list(graphs.keys()), "bbi")
+    # Create centered container for 3 buttons
+    col1, col2, col3 = st.columns([1,1,1])
+    with col1:
+        btn1 = st.button(list(graphs.keys())[0], key="btn1")
+    with col2:
+        btn2 = st.button(list(graphs.keys())[1], key="btn2")
+    with col3:
+        btn3 = st.button(list(graphs.keys())[2], key="btn3")
     
-    if btns[0]:
+    # Determine which graph to show
+    if btn1:
         selected_graph = list(graphs.keys())[0]
-    elif btns[1]:
+    elif btn2:
         selected_graph = list(graphs.keys())[1]
-    elif btns[2]:
+    elif btn3:
         selected_graph = list(graphs.keys())[2]
     else:
-        selected_graph = list(graphs.keys())[0]
+        selected_graph = list(graphs.keys())[0]  # Default
     
+    # Display the selected graph
     st.subheader(selected_graph)
     st.image(graphs[selected_graph], use_container_width=True)
-    st.write("Insights and explanation for:", selected_graph)
+    
+    # Insights section
+    st.write("""
+    ### Key Insights:
+    - Number of Bedrooms: More bedrooms increase price, but marginal gains diminish.
+    - Number of Bathrooms: More bathrooms increase price, with diminishing returns.
+    - Bed/Bath Ratio: Optimal ratio (~1.25) maximizes price; imbalanced ratios lower prices.
+    ### Final Answer:
+    - Bedrooms and bathrooms positively affect prices, with diminishing returns. Optimal bed/bath ratio (~1.25) maximizes value.
+    """)
 
+# House Size by City Type section
 elif section == "House Size by City Type":
     st.header("3. What is the average house size per city types in the U.S.?")
     
+    # Define the graphs for this section
     graphs = {
-        "House Size by City": "https://path_to_image_7.png",
-        "Property Size by City": "https://path_to_image_8.png",
-        "Acre Lot by City": "https://path_to_image_9.png"
+        "House Size by City": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20House%20Size%20by%20City%20Type.png",
+        "Property Size by City": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Property%20Size%20by%20City%20Type.png",
+        "Acre Lot by City": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Acre%20Lot%20by%20City%20Type.png"
     }
     
-    btns = three_buttons_layout(list(graphs.keys()), "hsc")
+    # Create centered container for 3 buttons
+    col1, col2, col3 = st.columns([1,1,1])
+    with col1:
+        btn1 = st.button(list(graphs.keys())[0], key="btn1")
+    with col2:
+        btn2 = st.button(list(graphs.keys())[1], key="btn2")
+    with col3:
+        btn3 = st.button(list(graphs.keys())[2], key="btn3")
     
-    if btns[0]:
+    # Determine which graph to show
+    if btn1:
         selected_graph = list(graphs.keys())[0]
-    elif btns[1]:
+    elif btn2:
         selected_graph = list(graphs.keys())[1]
-    elif btns[2]:
+    elif btn3:
         selected_graph = list(graphs.keys())[2]
     else:
-        selected_graph = list(graphs.keys())[0]
+        selected_graph = list(graphs.keys())[0]  # Default
     
+    # Display the selected graph
     st.subheader(selected_graph)
     st.image(graphs[selected_graph], use_container_width=True)
-    st.write("Insights and explanation for:", selected_graph)
+    
+    # Insights section
+    st.write("""
+    ### Key Insights:
+    - House Sizes: Larger in towns/small cities (less dense); smaller in metropolises (dense).
+    - Property/Lot Sizes: Larger in rural/suburban; smaller in urban.
+    ### Conclusion
+    - Average house sizes:
+        - Town: 1,721.2669 sq ft
+        - Small City: 1,753.2493 sq ft
+        - Medium City: 1,692.1574 sq ft
+        - Large City: 1,643.5799 sq ft
+        - Metropolis: 1,621.2234 sq ft
+    ### Final Answer:
+    - House sizes decrease with increasing population density.
+    """)
 
+# Urban/Suburban/Rural Prices section
 elif section == "Urban/Suburban/Rural Prices":
     st.header("4. How do prices fluctuate between urban, suburban and rural cities?")
     
+    # Define the graphs for this section
     graphs = {
-        "Price by Area Type": "https://path_to_image_10.png",
-        "Property Size by Area": "https://path_to_image_11.png",
-        "Population by Area": "https://path_to_image_12.png",
-        "Density by Area": "https://path_to_image_13.png"
+        "Price by Area Type": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Property%20Price%20by%20Area%20Type.png",
+        "Property Size by Area": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Property%20Size%20by%20Area%20Type.png",
+        "Population by Area": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Population%20(2024)%20by%20Area%20Type.png",
+        "Density by Area": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Population%20Density%20by%20Area%20Type.png"
     }
     
-    btns = four_buttons_layout(list(graphs.keys()), "usar")
+    # Create centered container for 4 buttons
+    col1, col2, col3, col4 = st.columns([1,1,1,1])
+    with col1:
+        btn1 = st.button(list(graphs.keys())[0], key="btn1")
+    with col2:
+        btn2 = st.button(list(graphs.keys())[1], key="btn2")
+    with col3:
+        btn3 = st.button(list(graphs.keys())[2], key="btn3")
+    with col4:
+        btn4 = st.button(list(graphs.keys())[3], key="btn4")
     
-    if btns[0]:
+    # Determine which graph to show
+    if btn1:
         selected_graph = list(graphs.keys())[0]
-    elif btns[1]:
+    elif btn2:
         selected_graph = list(graphs.keys())[1]
-    elif btns[2]:
+    elif btn3:
         selected_graph = list(graphs.keys())[2]
-    elif btns[3]:
+    elif btn4:
         selected_graph = list(graphs.keys())[3]
     else:
-        selected_graph = list(graphs.keys())[0]
+        selected_graph = list(graphs.keys())[0]  # Default
     
+    # Display the selected graph
     st.subheader(selected_graph)
     st.image(graphs[selected_graph], use_container_width=True)
-    st.write("Insights and explanation for:", selected_graph)
+    
+    # Insights section
+    st.write("""
+    ### Key Insights:
+    - Urban: Highest prices due to high density, limited land, and demand.
+    - Suburban: Mid-range prices, balancing affordability and features.
+    - Rural: Lowest prices, larger lots but less demand/amenities.
+    ### Final Answer:
+    - Prices increase from rural to suburban to urban due to density, land availability, and amenities.
+    """)
 
 # House Price Predictor section
 elif section == "House Price Predictor":
