@@ -392,12 +392,18 @@ elif section == "House Price Predictor":
     st.header("5. Predict House Price")
     st.write("Enter the details below to predict the house price based on property size, bedrooms, bathrooms, region, city type, area type, and city.")
     
-    # Map numerical codes to labels
+    # Map numerical codes to labels (with capitalized display but lowercase model values)
     city_type_map = {
-        "Town": 0, "Small City": 1, "Medium City": 2, "Large City": 3, "Metropolis": 4
+        "Town": 0, 
+        "Small City": 1, 
+        "Medium City": 2, 
+        "Large City": 3, 
+        "Metropolis": 4
     }
     area_type_map = {
-        "Rural": 0, "Suburban": 1, "Urban": 2
+        "Rural": 0, 
+        "Suburban": 1, 
+        "Urban": 2
     }
     
     st.subheader("Select Geographic Attributes")
@@ -409,26 +415,30 @@ elif section == "House Price Predictor":
     states = sorted(region_state_hierarchy[selected_region].keys()) if selected_region != "Select Region" else []
     selected_state = st.selectbox("Select State", ["Select State"] + states, index=0)
     
-    # City Type dropdown
-    city_types = sorted(region_state_hierarchy[selected_region][selected_state].keys()) \
+    # City Type dropdown (display capitalized but store lowercase for model)
+    city_types = ["Town", "Small City", "Medium City", "Large City", "Metropolis"] \
         if selected_region != "Select Region" and selected_state != "Select State" else []
     selected_city_type_label = st.selectbox("Select City Type", ["Select City Type"] + city_types, index=0)
     
-    # Area Type dropdown
-    area_types = sorted(
-        region_state_hierarchy[selected_region][selected_state][selected_city_type_label].keys()
-    ) if (selected_region != "Select Region" and selected_state != "Select State" and selected_city_type_label != "Select City Type") else []
+    # Area Type dropdown (display capitalized but store lowercase for model)
+    area_types = ["Rural", "Suburban", "Urban"] \
+        if (selected_region != "Select Region" and selected_state != "Select State" and selected_city_type_label != "Select City Type") else []
     selected_area_type_label = st.selectbox("Select Area Type", ["Select Area Type"] + area_types, index=0)
 
+    # Get numerical values for model
     selected_city_type = city_type_map.get(selected_city_type_label, 0)
-    selected_area_type = area_type_map.get(selected_area_type_label.lower(), 0)
+    selected_area_type = area_type_map.get(selected_area_type_label, 0)
     
     # City dropdown
     cities = []
     if (selected_region != "Select Region" and selected_state != "Select State" and 
         selected_city_type_label != "Select City Type" and selected_area_type_label != "Select Area Type"):
         try:
-            cities = region_state_hierarchy[selected_region][selected_state][selected_city_type_label][selected_area_type_label]
+            # Use lowercase version for dictionary lookup
+            lowercase_city_type = selected_city_type_label.lower().replace(" ", "")
+            lowercase_area_type = selected_area_type_label.lower()
+            
+            cities = region_state_hierarchy[selected_region][selected_state][lowercase_city_type][lowercase_area_type]
             if not isinstance(cities, list):
                 st.error("City list is not valid.")
                 cities = []
@@ -447,56 +457,61 @@ elif section == "House Price Predictor":
         bath = st.number_input("Number of Bathrooms", min_value=1, max_value=20, value=1, step=1)
     
     if st.button("Predict House Price"):
-        bed_bath_ratio = bed / bath if bath != 0 else 1.0
-        input_data = {
-            'property_size': property_size,
-            'bed': bed,
-            'bath': bath,
-            'bed_bath_ratio': bed_bath_ratio,
-            'city_type': selected_city_type,
-            'area_type': selected_area_type,
-            'region_Midwest': 1 if selected_region == 'Midwest' else 0,
-            'region_Northeast': 1 if selected_region == 'Northeast' else 0,
-            'region_South': 1 if selected_region == 'South' else 0,
-            'region_West': 1 if selected_region == 'West' else 0,
-        }
-        input_df = pd.DataFrame([input_data])
-        
-        # Transform numerical features
-        for col in ['property_size', 'bed_bath_ratio']:
-            if col in input_df.columns and col in power_transformers:
-                input_df[col] = np.log1p(input_df[col])
-                input_df[col] = power_transformers[col].transform(input_df[[col]])
-                input_df[col] = scalers[col].transform(input_df[[col]])
-        
-        # Add missing features with defaults
-        for feature in model_features:
-            if feature not in input_df.columns:
-                if feature in df.columns:
-                    median_value = df[feature].median()
-                    if feature in power_transformers and feature not in ['bed', 'bath']:
-                        median_df = pd.DataFrame({feature: [median_value]})
-                        median_df[feature] = np.log1p(median_df[feature])
-                        median_df[feature] = power_transformers[feature].transform(median_df[[feature]])[0][0]
-                        if feature in scalers:
-                            median_df[feature] = scalers[feature].transform(median_df[[feature]])[0][0]
-                        input_df[feature] = median_df[feature]
+        if (selected_region == "Select Region" or selected_state == "Select State" or 
+            selected_city_type_label == "Select City Type" or selected_area_type_label == "Select Area Type" or
+            selected_city == "Select City"):
+            st.error("Please select all geographic attributes")
+        else:
+            bed_bath_ratio = bed / bath if bath != 0 else 1.0
+            input_data = {
+                'property_size': property_size,
+                'bed': bed,
+                'bath': bath,
+                'bed_bath_ratio': bed_bath_ratio,
+                'city_type': selected_city_type,
+                'area_type': selected_area_type,
+                'region_Midwest': 1 if selected_region == 'Midwest' else 0,
+                'region_Northeast': 1 if selected_region == 'Northeast' else 0,
+                'region_South': 1 if selected_region == 'South' else 0,
+                'region_West': 1 if selected_region == 'West' else 0,
+            }
+            input_df = pd.DataFrame([input_data])
+            
+            # Transform numerical features
+            for col in ['property_size', 'bed_bath_ratio']:
+                if col in input_df.columns and col in power_transformers:
+                    input_df[col] = np.log1p(input_df[col])
+                    input_df[col] = power_transformers[col].transform(input_df[[col]])
+                    input_df[col] = scalers[col].transform(input_df[[col]])
+            
+            # Add missing features with defaults
+            for feature in model_features:
+                if feature not in input_df.columns:
+                    if feature in df.columns:
+                        median_value = df[feature].median()
+                        if feature in power_transformers and feature not in ['bed', 'bath']:
+                            median_df = pd.DataFrame({feature: [median_value]})
+                            median_df[feature] = np.log1p(median_df[feature])
+                            median_df[feature] = power_transformers[feature].transform(median_df[[feature]])[0][0]
+                            if feature in scalers:
+                                median_df[feature] = scalers[feature].transform(median_df[[feature]])[0][0]
+                            input_df[feature] = median_df[feature]
+                        else:
+                            input_df[feature] = median_value
                     else:
-                        input_df[feature] = median_value
+                        input_df[feature] = 0
+            
+            input_df = input_df[model_features]
+            
+            # Predict and inverse-transform the price
+            try:
+                prediction = model.predict(input_df)[0]
+                if 'price' in power_transformers:
+                    unscaled_prediction = scalers['price'].inverse_transform([[prediction]])[0][0]
+                    untransformed_prediction = power_transformers['price'].inverse_transform([[unscaled_prediction]])[0][0]
+                    final_prediction = np.expm1(untransformed_prediction)
                 else:
-                    input_df[feature] = 0
-        
-        input_df = input_df[model_features]
-        
-        # Predict and inverse-transform the price
-        try:
-            prediction = model.predict(input_df)[0]
-            if 'price' in power_transformers:
-                unscaled_prediction = scalers['price'].inverse_transform([[prediction]])[0][0]
-                untransformed_prediction = power_transformers['price'].inverse_transform([[unscaled_prediction]])[0][0]
-                final_prediction = np.expm1(untransformed_prediction)
-            else:
-                final_prediction = prediction
-            st.success(f"**Predicted House Price in {selected_city}:** ${final_prediction:,.2f}")
-        except Exception as e:
-            st.error(f"Prediction error: {str(e)}")
+                    final_prediction = prediction
+                st.success(f"**Predicted House Price in {selected_city}:** ${final_prediction:,.2f}")
+            except Exception as e:
+                st.error(f"Prediction error: {str(e)}")
