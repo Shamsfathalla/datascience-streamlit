@@ -600,12 +600,12 @@ if section == "House Price Predictor":
     st.header("5. Predict House Price")
     st.write("Enter the details below to predict the house price based on property size, bedrooms, bathrooms, region, city type, area type, and city.")
 
-    # Map numerical codes to labels (all keys lowercase)
+    # Map numerical codes to labels
     city_type_map = {
-        "town": 0, "small city": 1, "medium city": 2, "large city": 3, "metropolis": 4
+        "Town": 0, "Small City": 1, "Medium City": 2, "Large City": 3, "Metropolis": 4
     }
     area_type_map = {
-        "rural": 0, "suburban": 1, "urban": 2
+        "Rural": 0, "Suburban": 1, "Urban": 2
     }
 
     st.subheader("Select Geographic Attributes")
@@ -633,8 +633,7 @@ if section == "House Price Predictor":
     ) if (selected_region != "Select Region" and selected_state != "Select State" and selected_city_type_label != "Select City Type") else []
     selected_area_type_label = st.selectbox("Select Area Type", ["Select Area Type"] + area_types, index=0)
 
-    # Convert selected labels to lowercase for mapping
-    selected_city_type = city_type_map.get(selected_city_type_label.lower(), 0)
+    selected_city_type = city_type_map.get(selected_city_type_label, 0)
     selected_area_type = area_type_map.get(selected_area_type_label.lower(), 0)
 
     # City dropdown
@@ -716,4 +715,3 @@ if section == "House Price Predictor":
             st.success(f"**Predicted House Price in {selected_city}:** ${final_prediction:,.2f}")
         except Exception as e:
             st.error(f"Prediction error: {str(e)}")
-
