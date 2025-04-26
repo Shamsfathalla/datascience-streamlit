@@ -392,7 +392,7 @@ elif section == "House Price Predictor":
     st.header("5. Predict House Price")
     st.write("Enter the details below to predict the house price based on property size, bedrooms, bathrooms, region, city type, area type, and city.")
     
-    # Map numerical codes to labels (with capitalized display but lowercase model values)
+    # Map numerical codes to labels
     city_type_map = {
         "Town": 0, 
         "Small City": 1, 
@@ -415,17 +415,16 @@ elif section == "House Price Predictor":
     states = sorted(region_state_hierarchy[selected_region].keys()) if selected_region != "Select Region" else []
     selected_state = st.selectbox("Select State", ["Select State"] + states, index=0)
     
-    # City Type dropdown (display capitalized but store lowercase for model)
+    # City Type dropdown
     city_types = ["Town", "Small City", "Medium City", "Large City", "Metropolis"] \
         if selected_region != "Select Region" and selected_state != "Select State" else []
     selected_city_type_label = st.selectbox("Select City Type", ["Select City Type"] + city_types, index=0)
     
-    # Area Type dropdown (display capitalized but store lowercase for model)
+    # Area Type dropdown
     area_types = ["Rural", "Suburban", "Urban"] \
         if (selected_region != "Select Region" and selected_state != "Select State" and selected_city_type_label != "Select City Type") else []
     selected_area_type_label = st.selectbox("Select Area Type", ["Select Area Type"] + area_types, index=0)
 
-    # Get numerical values for model
     selected_city_type = city_type_map.get(selected_city_type_label, 0)
     selected_area_type = area_type_map.get(selected_area_type_label, 0)
     
@@ -434,11 +433,11 @@ elif section == "House Price Predictor":
     if (selected_region != "Select Region" and selected_state != "Select State" and 
         selected_city_type_label != "Select City Type" and selected_area_type_label != "Select Area Type"):
         try:
-            # Use lowercase version for dictionary lookup
-            lowercase_city_type = selected_city_type_label.lower().replace(" ", "")
-            lowercase_area_type = selected_area_type_label.lower()
+            # Convert to lowercase for dictionary lookup
+            lookup_city_type = selected_city_type_label.lower().replace(" ", "")
+            lookup_area_type = selected_area_type_label.lower()
             
-            cities = region_state_hierarchy[selected_region][selected_state][lowercase_city_type][lowercase_area_type]
+            cities = region_state_hierarchy[selected_region][selected_state][lookup_city_type][lookup_area_type]
             if not isinstance(cities, list):
                 st.error("City list is not valid.")
                 cities = []
@@ -488,16 +487,22 @@ elif section == "House Price Predictor":
             for feature in model_features:
                 if feature not in input_df.columns:
                     if feature in df.columns:
-                        median_value = df[feature].median()
-                        if feature in power_transformers and feature not in ['bed', 'bath']:
-                            median_df = pd.DataFrame({feature: [median_value]})
-                            median_df[feature] = np.log1p(median_df[feature])
-                            median_df[feature] = power_transformers[feature].transform(median_df[[feature]])[0][0]
-                            if feature in scalers:
-                                median_df[feature] = scalers[feature].transform(median_df[[feature]])[0][0]
-                            input_df[feature] = median_df[feature]
+                        # Only calculate median for numeric columns
+                        if pd.api.types.is_numeric_dtype(df[feature]):
+                            median_value = df[feature].median()
+                            if feature in power_transformers and feature not in ['bed', 'bath']:
+                                median_df = pd.DataFrame({feature: [median_value]})
+                                median_df[feature] = np.log1p(median_df[feature])
+                                median_df[feature] = power_transformers[feature].transform(median_df[[feature]])[0][0]
+                                if feature in scalers:
+                                    median_df[feature] = scalers[feature].transform(median_df[[feature]])[0][0]
+                                input_df[feature] = median_df[feature]
+                            else:
+                                input_df[feature] = median_value
                         else:
-                            input_df[feature] = median_value
+                            # For non-numeric columns, use the mode (most frequent value)
+                            mode_value = df[feature].mode()[0]
+                            input_df[feature] = mode_value
                     else:
                         input_df[feature] = 0
             
