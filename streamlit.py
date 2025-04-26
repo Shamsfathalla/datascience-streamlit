@@ -388,13 +388,6 @@ elif section == "Urban/Suburban/Rural Prices":
     - Prices increase from rural to suburban to urban due to density, land availability, and amenities.
     """)
 
-import streamlit as st
-import plotly.graph_objects as go
-import pandas as pd
-import numpy as np
-
-# Your existing variables (region_state_hierarchy, power_transformers, scalers, model, df) assumed imported
-
 # State name to abbreviation mapping
 state_abbrev = {
     'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA',
@@ -502,6 +495,25 @@ def plot_region_map(selected_state_name):
             name='Selected State'
         ))
 
+    # Add custom legend (colored dots + text) on the right
+    legend_x = 1.02  # just outside map right boundary
+    legend_y_start = 0.9
+    legend_y_step = 0.1
+    region_names = ['Northeast', 'Midwest', 'South', 'West']
+    region_colors = ['#636efa', '#EF553B', '#00cc96', '#ab63fa']
+
+    for i, (region, color) in enumerate(zip(region_names, region_colors)):
+        fig.add_trace(go.Scatter(
+            x=[legend_x],
+            y=[legend_y_start - i * legend_y_step],
+            mode='markers+text',
+            marker=dict(size=20, color=color),
+            text=[region],
+            textposition='middle right',
+            showlegend=False,
+            hoverinfo='none'
+        ))
+
     fig.update_layout(
         title_text='US Map Colored by Region with Selected State Highlight',
         geo=dict(
@@ -510,7 +522,7 @@ def plot_region_map(selected_state_name):
             showlakes=True,
             lakecolor='rgb(255, 255, 255)'
         ),
-        margin={"r":0,"t":40,"l":0,"b":0}
+        margin={"r":150,"t":40,"l":0,"b":0}  # add right margin for legend
     )
     return fig
 
@@ -610,30 +622,19 @@ if section == "House Price Predictor":
             if feature not in input_df.columns:
                 if feature in df.columns:
                     median_value = df[feature].median()
-                    if feature in power_transformers and feature not in ['bed', 'bath']:
-                        median_df = pd.DataFrame({feature: [median_value]})
-                        median_df[feature] = np.log1p(median_df[feature])
-                        median_df[feature] = power_transformers[feature].transform(median_df[[feature]])[0][0]
-                        if feature in scalers:
-                            median_df[feature] = scalers[feature].transform(median_df[[feature]])[0][0]
-                        input_df[feature] = median_df[feature]
+                    if feature in power_transformers:
+                        val = np.log1p(median_value)
+                        val = power_transformers[feature].transform(np.array(val).reshape(1, -1))
+                        val = scalers[feature].transform(val)
+                        input_df[feature] = val[0, 0]
                     else:
                         input_df[feature] = median_value
                 else:
                     input_df[feature] = 0
+
         input_df = input_df[model_features]
 
-        # Predict and inverse-transform the price
-        try:
-            prediction = model.predict(input_df)[0]
-            if 'price' in power_transformers:
-                unscaled_prediction = scalers['price'].inverse_transform([[prediction]])[0][0]
-                untransformed_prediction = power_transformers['price'].inverse_transform([[unscaled_prediction]])[0][0]
-                final_prediction = np.expm1(untransformed_prediction)
-            else:
-                final_prediction = prediction
-            st.success(f"**Predicted House Price in {selected_city}:** ${final_prediction:,.2f}")
-        except Exception as e:
-            st.error(f"Prediction error: {str(e)}")
-
-
+        # Predict house price
+        price_pred = model.predict(input_df)
+        predicted_price = np.expm1(price_pred[0])  # reverse log1p transform
+        st.success(f"Predicted House Price: ${predicted_price:,.2f}")
