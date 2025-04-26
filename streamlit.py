@@ -8,7 +8,7 @@ import joblib
 import json
 from sklearn.preprocessing import MinMaxScaler, PowerTransformer
 
-# Set page config (must be first Streamlit command)
+# Set page config 
 st.set_page_config(page_title="U.S. Housing Market Analysis", layout="wide")
 
 # Initialize session state to track dataset, model, and hierarchy loading
@@ -169,19 +169,22 @@ if section == "Home":
 # Regional Price Differences section
 elif section == "Regional Price Differences":
     st.header("1. How do property prices differ between the different U.S. regions?")
-    # Display pre-existing images
-    st.subheader("Average Property Price by Region")
-    st.image("https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Property%20Price%20by%20Region.png",
-             use_container_width=True)
     
-    st.subheader("Average Population in 2024 by Region")
-    st.image("https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Population%20in%202024%20by%20Region.png",
-             use_container_width=True)
+    # Define the graphs for this section
+    graphs = {
+        "Average Property Price by Region": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Property%20Price%20by%20Region.png",
+        "Average Population in 2024 by Region": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Population%20in%202024%20by%20Region.png",
+        "Average Density by Region": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Density%20by%20Region.png"
+    }
     
-    st.subheader("Average Density by Region")
-    st.image("https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Density%20by%20Region.png",
-             use_container_width=True)
+    # Create navigation tabs for graphs
+    selected_graph = st.radio("Select a graph to view:", list(graphs.keys()), horizontal=True)
     
+    # Display the selected graph
+    st.subheader(selected_graph)
+    st.image(graphs[selected_graph], use_container_width=True)
+    
+    # Consistent insights section
     st.write("""
     ### Key Insights:
     - West Region:
@@ -195,7 +198,7 @@ elif section == "Regional Price Differences":
         - Population and Density: With a lower population density (3,302.13) than the Northeast and West, the South's prices reflect economic growth and migration patterns.
     - Midwest Region:
         - Property Price: The Midwest has the lowest average property price at approximately $231,103.74.
-        - Population and Density: The Midwest’s low population density and slower economic growth impact housing demand.
+        - Population and Density: The Midwest's low population density and slower economic growth impact housing demand.
     ### Final Answer:
     - Property Prices: West (Highest) > South > Northeast > Midwest (Lowest).
     - Driven by population density, urban development, economic activity, and regional demand.
@@ -204,25 +207,22 @@ elif section == "Regional Price Differences":
 # Bedrooms/Bathrooms Impact section
 elif section == "Bedrooms/Bathrooms Impact":
     st.header("2. How does the number of bedrooms and bathrooms affect home prices?")
-    # Validate required columns
-    required_cols = ['bed', 'bath', 'bed_bath_ratio', 'price']
-    if not all(col in df.columns for col in required_cols):
-        st.error("Missing columns: " + ", ".join([col for col in required_cols if col not in df.columns]))
-        st.stop()
     
-    # Display pre-existing images
-    st.subheader("Bedrooms vs Price")
-    st.image("https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Bedrooms%20vs%20Price.png",
-             use_container_width=True)
+    # Define the graphs for this section
+    graphs = {
+        "Bedrooms vs Price": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Bedrooms%20vs%20Price.png",
+        "Bathrooms vs Price": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Bathrooms%20vs%20Price.png",
+        "Bed/Bath Ratio vs Price": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Bed&Bath%20Ratio%20vs%20Price.png"
+    }
     
-    st.subheader("Bathrooms vs Price")
-    st.image("https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Bathrooms%20vs%20Price.png",
-             use_container_width=True)
+    # Create navigation tabs for graphs
+    selected_graph = st.radio("Select a graph to view:", list(graphs.keys()), horizontal=True)
     
-    st.subheader("Bed/Bath Ratio vs Price")
-    st.image("https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Bed&Bath%20Ratio%20vs%20Price.png",
-             use_container_width=True)
+    # Display the selected graph
+    st.subheader(selected_graph)
+    st.image(graphs[selected_graph], use_container_width=True)
     
+    # Consistent insights section
     st.write("""
     ### Key Insights:
     - Number of Bedrooms: More bedrooms increase price, but marginal gains diminish.
@@ -236,31 +236,22 @@ elif section == "Bedrooms/Bathrooms Impact":
 # House Size by City Type section
 elif section == "House Size by City Type ":
     st.header("3. What is the average house size per city types in the U.S.?")
-    # Map area_type and city_type labels
-    area_type_map = {0: 'Rural', 1: 'Suburban', 2: 'Urban'}
-    city_type_labels = {
-        0: 'Town',
-        1: 'Small City',
-        2: 'Medium City',
-        3: 'Large City',
-        4: 'Metropolis'
+    
+    # Define the graphs for this section
+    graphs = {
+        "Average House Size by City Type": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20House%20Size%20by%20City%20Type.png",
+        "Average Property Size by City Type": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Property%20Size%20by%20City%20Type.png",
+        "Average Acre Lot by City Type": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Acre%20Lot%20by%20City%20Type.png"
     }
-    df['area_type_label'] = df['area_type'].map(area_type_map)
-    df['city_type_label'] = df['city_type'].map(city_type_labels)
     
-    # Display pre-existing images
-    st.subheader("Average House Size by City Type")
-    st.image("https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20House%20Size%20by%20City%20Type.png",
-             use_container_width=True)
+    # Create navigation tabs for graphs
+    selected_graph = st.radio("Select a graph to view:", list(graphs.keys()), horizontal=True)
     
-    st.subheader("Average Property Size by City Type")
-    st.image("https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Property%20Size%20by%20City%20Type.png",
-             use_container_width=True)
+    # Display the selected graph
+    st.subheader(selected_graph)
+    st.image(graphs[selected_graph], use_container_width=True)
     
-    st.subheader("Average Acre Lot by City Type")
-    st.image("https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Acre%20Lot%20by%20City%20Type.png",
-             use_container_width=True)
-    
+    # Consistent insights section
     st.write("""
     ### Key Insights:
     - House Sizes: Larger in towns/small cities (less dense); smaller in metropolises (dense).
@@ -281,36 +272,23 @@ elif section == "House Size by City Type ":
 # Urban/Suburban/Rural Prices section
 elif section == "Urban/Suburban/Rural Prices":
     st.header("4. How do prices fluctuate between urban, suburban and rural cities?")
-    # Mapping for readability
-    area_type_map = {0: 'Rural', 1: 'Suburban', 2: 'Urban'}
-    city_type_labels = {
-        0: 'Town',
-        1: 'Small City',
-        2: 'Medium City',
-        3: 'Large City',
-        4: 'Metropolis'
+    
+    # Define the graphs for this section
+    graphs = {
+        "Average Property Price by Area Type": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Property%20Price%20by%20Area%20Type.png",
+        "Average Property Size by Area Type": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Property%20Size%20by%20Area%20Type.png",
+        "Average Population (2024) by Area Type": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Population%20(2024)%20by%20Area%20Type.png",
+        "Average Population Density by Area Type": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Population%20Density%20by%20Area%20Type.png"
     }
-    df['area_type_label'] = df['area_type'].map(area_type_map)
-    df['city_type_label'] = df['city_type'].map(city_type_labels)
-    df['city_type_label'] = pd.Categorical(df['city_type_label'], categories=['Town', 'Small City', 'Medium City', 'Large City', 'Metropolis'], ordered=True)
     
-    # Display pre-existing images
-    st.subheader("Average Property Price by Area Type")
-    st.image("https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Property%20Price%20by%20Area%20Type.png",
-             use_container_width=True)
+    # Create navigation tabs for graphs
+    selected_graph = st.radio("Select a graph to view:", list(graphs.keys()), horizontal=True)
     
-    st.subheader("Average Property Size by Area Type")
-    st.image("https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Property%20Size%20by%20Area%20Type.png",
-             use_container_width=True)
+    # Display the selected graph
+    st.subheader(selected_graph)
+    st.image(graphs[selected_graph], use_container_width=True)
     
-    st.subheader("Average Population (2024) by Area Type")
-    st.image("https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Population%20(2024)%20by%20Area%20Type.png",
-             use_container_width=True)
-    
-    st.subheader("Average Population Density by Area Type")
-    st.image("https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Population%20Density%20by%20Area%20Type.png",
-             use_container_width=True)
-    
+    # Consistent insights section
     st.write("""
     ### Key Insights:
     - Urban: Highest prices due to high density, limited land, and demand.
