@@ -146,7 +146,7 @@ st.markdown("""
         border: none;
         border-radius: 10px;
         padding: 8px 16px;
-        margin: 0 5px 5px 0;
+        margin: 0 5px;
         cursor: pointer;
         font-size: 14px;
         display: inline-block;
@@ -157,6 +157,21 @@ st.markdown("""
     }
     .stButton > button {
         width: auto;
+        margin: 0 5px;
+        padding: 8px 16px;
+        border-radius: 10px;
+        background-color: rgb(38, 39, 48);
+        color: white;
+        border: none;
+    }
+    .stButton > button:hover {
+        background-color: rgb(50, 51, 60);
+    }
+    .button-container {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 20px;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -201,14 +216,16 @@ elif section == "Regional Price Differences":
         "Average Density by Region": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Density%20by%20Region.png"
     }
     
-    # Create centered container for 3 buttons
-    col1, col2, col3 = st.columns([1,1,1])
+    # Create a container for three buttons, centered with the middle button aligned
+    st.markdown('<div class="button-container">', unsafe_allow_html=True)
+    col1, col2, col3 = st.columns([1, 1, 1])
     with col1:
         btn1 = st.button(list(graphs.keys())[0], key="btn1")
     with col2:
         btn2 = st.button(list(graphs.keys())[1], key="btn2")
     with col3:
         btn3 = st.button(list(graphs.keys())[2], key="btn3")
+    st.markdown('</div>', unsafe_allow_html=True)
     
     # Determine which graph to show
     if btn1:
@@ -255,14 +272,16 @@ elif section == "Bedrooms/Bathrooms Impact":
         "Bed/Bath Ratio vs Price": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Bed&Bath%20Ratio%20vs%20Price.png"
     }
     
-    # Create centered container for 3 buttons
-    col1, col2, col3 = st.columns([1,1,1])
+    # Create a container for three buttons, centered with the middle button aligned
+    st.markdown('<div class="button-container">', unsafe_allow_html=True)
+    col1, col2, col3 = st.columns([1, 1, 1])
     with col1:
         btn1 = st.button(list(graphs.keys())[0], key="btn1")
     with col2:
         btn2 = st.button(list(graphs.keys())[1], key="btn2")
     with col3:
         btn3 = st.button(list(graphs.keys())[2], key="btn3")
+    st.markdown('</div>', unsafe_allow_html=True)
     
     # Determine which graph to show
     if btn1:
@@ -299,14 +318,16 @@ elif section == "House Size by City Type":
         "Acre Lot by City": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Acre%20Lot%20by%20City%20Type.png"
     }
     
-    # Create centered container for 3 buttons
-    col1, col2, col3 = st.columns([1,1,1])
+    # Create a container for three buttons, centered with the middle button aligned
+    st.markdown('<div class="button-container">', unsafe_allow_html=True)
+    col1, col2, col3 = st.columns([1, 1, 1])
     with col1:
         btn1 = st.button(list(graphs.keys())[0], key="btn1")
     with col2:
         btn2 = st.button(list(graphs.keys())[1], key="btn2")
     with col3:
         btn3 = st.button(list(graphs.keys())[2], key="btn3")
+    st.markdown('</div>', unsafe_allow_html=True)
     
     # Determine which graph to show
     if btn1:
@@ -350,8 +371,9 @@ elif section == "Urban/Suburban/Rural Prices":
         "Density by Area": "https://raw.githubusercontent.com/Shamsfathalla/datascience-streamlit/0d4ccb38eae49fa972b94d44116c05c44b640f16/Images/Average%20Population%20Density%20by%20Area%20Type.png"
     }
     
-    # Create centered container for 4 buttons
-    col1, col2, col3, col4 = st.columns([1,1,1,1])
+    # Create a container for four buttons, centered between the two middle buttons
+    st.markdown('<div class="button-container">', unsafe_allow_html=True)
+    col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
     with col1:
         btn1 = st.button(list(graphs.keys())[0], key="btn1")
     with col2:
@@ -360,6 +382,7 @@ elif section == "Urban/Suburban/Rural Prices":
         btn3 = st.button(list(graphs.keys())[2], key="btn3")
     with col4:
         btn4 = st.button(list(graphs.keys())[3], key="btn4")
+    st.markdown('</div>', unsafe_allow_html=True)
     
     # Determine which graph to show
     if btn1:
@@ -447,7 +470,7 @@ elif section == "House Price Predictor":
         bath = st.number_input("Number of Bathrooms", min_value=1, max_value=20, value=1, step=1)
     
     if st.button("Predict House Price"):
-        bed_bath_ratio = bed / bath if bath != 0 else 1.0
+        bed_bath_ratio = bed / bath if bath != 0 else 1.neria
         input_data = {
             'property_size': property_size,
             'bed': bed,
